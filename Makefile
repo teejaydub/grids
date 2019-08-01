@@ -5,7 +5,7 @@ test:
 	python grids.py --test
 
 install:
-	easy_install .
+	pip install --editable .
 
 depends:
 	conda env create
