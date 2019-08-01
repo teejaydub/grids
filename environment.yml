@@ -1,0 +1,5 @@
+name: grids
+dependencies:
+- python=3
+- pyyaml
+- click
