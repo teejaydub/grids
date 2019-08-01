@@ -2,7 +2,7 @@ run:
 	python grids.py
 
 test:
-	python grids.py --test
+	python grids.py test
 
 install:
 	pip install --editable .

@@ -5,37 +5,36 @@ import yaml
 
 @click.group()
 def cli():
-  # import argparse
-
-#   parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
-#                                    description='Solve grid-based puzzles.',
-#                                    epilog="""
+  """ Analyze grid-based puzzles. """
 # Example constraint file for Sudoku:
 
-# 	- Sudoku  # includes constraints from Sudoku.yaml
-# 	- initial: |
-# 	  1****6***
-# 	  *********
-# 	  ****7****
-# 	  ********3
-# 	  *********
-# 	  **8******
-# 	  *********
-# 	  ******5**
-# 	  *********
-
-# See README.md for full documentation.
+#   - Sudoku  # includes constraints from Sudoku.yaml
+#   - initial: |
+#     1****6***
+#     *********
+#     ****7****
+#     ********3
+#     *********
+#     **8******
+#     *********
+#     ******5**
+#     *********
 # """)
 #   parser.add_argument('input', nargs='*',
 #                       help="""A YAML file containing constraints that define the puzzle to solve.  Assumes .yaml.""")
-#   parser.add_argument('--test', action='store_true', help='Run unit tests (only).')
-
-#   args = parser.parse_args()
-	pass
+  pass
 
 @cli.command()
 def solve():
-	click.echo("Solving...")
+  """ Solve a puzzle specified by a constraints file. """
+  click.echo("Solving...")
+
+@cli.command()
+@click.option('-v', '--verbose', is_flag=True)
+def test(verbose):
+  """ Run regression tests. """
+  import doctest
+  doctest.testmod(verbose=verbose)
 
 if __name__ == "__main__":
   cli()
