@@ -1,7 +1,7 @@
 # Command-line intrface for solving grid-based puzzles.
 
 import click
-import yaml
+from puzzle import Puzzle
 
 @click.group()
 
@@ -17,13 +17,10 @@ def cli():
 def solve(input, verbose):
   """ Solve a puzzle specified by one or more constraints files. """
   if verbose: click.echo("Loading...")
+  puzzle = Puzzle()
   for i in input:
-    while True:
-      chunk = i.read(1024)
-      if not chunk:
-          break
-      if verbose: click.echo(chunk)
-
+    puzzle.loadConstraints(i)
+  if verbose: click.echo(puzzle)
   click.echo("Solving...")
 
 @cli.command()
@@ -32,6 +29,7 @@ def test(verbose):
   """ Run regression tests. """
   import doctest
   doctest.testmod(verbose=verbose)
+  doctest.testmod(puzzle, verbose=verbose)
 
 if __name__ == "__main__":
   cli()

@@ -1,11 +1,11 @@
 # Sudoku basic constraints
 size: [9, 9]
 contraints:
-	- SymbolsNumericByDiameter
-	- EachDimensionIsCompletePermutation
-	- name: RegionsAreCompletePermutation
-		regions: [
-			[a0-c2], [a3-c5], [a6-c8],
-			[d0-f2], [d3-f5], [d6-f8],
-			[g0-i2], [g3-i5], [g6-i8]
-		]
+  - SymbolsNumericByDiameter
+  - EachDimensionIsCompletePermutation
+  - name: RegionsAreCompletePermutation
+    regions: [
+      [a0-c2], [a3-c5], [a6-c8],
+      [d0-f2], [d3-f5], [d6-f8],
+      [g0-i2], [g3-i5], [g6-i8]
+    ]
