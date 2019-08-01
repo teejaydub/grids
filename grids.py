@@ -4,33 +4,30 @@ import click
 import yaml
 
 @click.group()
+
 def cli():
   """ Analyze grid-based puzzles. """
-# Example constraint file for Sudoku:
-
-#   - Sudoku  # includes constraints from Sudoku.yaml
-#   - initial: |
-#     1****6***
-#     *********
-#     ****7****
-#     ********3
-#     *********
-#     **8******
-#     *********
-#     ******5**
-#     *********
-# """)
 #   parser.add_argument('input', nargs='*',
 #                       help="""A YAML file containing constraints that define the puzzle to solve.  Assumes .yaml.""")
   pass
 
 @cli.command()
-def solve():
-  """ Solve a puzzle specified by a constraints file. """
+@click.argument('input', type=click.File('rb'), nargs=-1)
+@click.option('-v/-q', '--verbose/--quiet', 'verbose')
+def solve(input, verbose):
+  """ Solve a puzzle specified by one or more constraints files. """
+  if verbose: click.echo("Loading...")
+  for i in input:
+    while True:
+      chunk = i.read(1024)
+      if not chunk:
+          break
+      if verbose: click.echo(chunk)
+
   click.echo("Solving...")
 
 @cli.command()
-@click.option('-v', '--verbose', is_flag=True)
+@click.option('-v/-q', '--verbose/--quiet', 'verbose')
 def test(verbose):
   """ Run regression tests. """
   import doctest
