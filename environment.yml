@@ -1,5 +1,6 @@
 name: grids
 dependencies:
 - python=3
-- pyyaml
 - click
+- pyyaml
+- setuptools

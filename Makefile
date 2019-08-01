@@ -4,6 +4,9 @@ run:
 test:
 	python grids.py --test
 
+install:
+	easy_install .
+
 depends:
 	conda env create
 	conda activate grids

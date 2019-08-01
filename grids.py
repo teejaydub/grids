@@ -3,8 +3,8 @@
 import click
 import yaml
 
-@click.command()
-def grids():
+@click.group()
+def cli():
   # import argparse
 
 #   parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -33,5 +33,9 @@ def grids():
 #   args = parser.parse_args()
 	pass
 
+@cli.command()
+def solve():
+	click.echo("Solving...")
+
 if __name__ == "__main__":
-  grids()
+  cli()
