@@ -1,3 +1,4 @@
+import io
 import pathlib
 import yaml
 
@@ -5,21 +6,19 @@ class Puzzle:
 	def __init__(self):
 		self.constraints = {}
 
-	def loadConstraints(self, f):
-		""" Add constraints to the puzzle from a YAML constraints file. 
-				The file must be open.
-		"""
-		self.addConstraints(yaml.safe_load(f))
-
 	def addConstraints(self, constraints):
-		""" If constraints is a list, add each element of the list as a new constraint.
-			 	If constraints is a single object, absorb its members.
+		""" Add constraints from various sources, distinguished by type.
 		"""
-		if isinstance(constraints, list):
+		if isinstance(constraints, io.IOBase):
+			self.addConstraints(yaml.safe_load(constraints))
+		elif isinstance(constraints, list):
 			for constraint in constraints:
 				self.addConstraints(constraint)
 		elif isinstance(constraints, str):
 			self.addConstraintNamed(constraints)
+		else:
+			# Absorb all named properties we recognize.
+			pass
 
 	def addConstraintNamed(self, c):
 		""" Adds a constraint with the given name, if we know it.
@@ -39,7 +38,7 @@ class Puzzle:
 		"""
 		try:
 			p = pathlib.Path(filename)
-			self.loadConstraints(p.open())
+			self.addConstraints(p.open())
 			return True
 		except OSError:  # let other loading exceptions propagate
 			return False

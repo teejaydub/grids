@@ -2,14 +2,12 @@
 # Command-line intrface for solving grid-based puzzles.
 
 import click
-from puzzle import Puzzle
+import puzzle
 
 @click.group()
 
 def cli():
   """ Analyze grid-based puzzles. """
-#   parser.add_argument('input', nargs='*',
-#                       help="""A YAML file containing constraints that define the puzzle to solve.  Assumes .yaml.""")
   pass
 
 @cli.command()
@@ -17,11 +15,11 @@ def cli():
 @click.option('-v/-q', '--verbose/--quiet', 'verbose')
 def solve(input, verbose):
   """ Solve a puzzle specified by one or more INPUT constraints files. """
-  puzzle = Puzzle()
+  p = puzzle.Puzzle()
   for i in input:
-    puzzle.loadConstraints(i)
+    p.addConstraints(i)
   click.echo("Solving...")
-  if verbose: click.echo(puzzle)
+  if verbose: click.echo(p)
 
 @cli.command()
 @click.option('-v/-q', '--verbose/--quiet', 'verbose')
