@@ -8,7 +8,7 @@ class Puzzle:
 		""" Add constraints to the puzzle from a YAML constraints file. 
 				The file must be open.
 		"""
-		self.constraints = yaml.load(f)
+		self.constraints = yaml.safe_load(f)
 
 	def __str__(self):
 		return str(self.constraints)
