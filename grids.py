@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Command-line intrface for solving grid-based puzzles.
 
 import click
@@ -15,13 +16,12 @@ def cli():
 @click.argument('input', type=click.File('rb'), nargs=-1)
 @click.option('-v/-q', '--verbose/--quiet', 'verbose')
 def solve(input, verbose):
-  """ Solve a puzzle specified by one or more constraints files. """
-  if verbose: click.echo("Loading...")
+  """ Solve a puzzle specified by one or more INPUT constraints files. """
   puzzle = Puzzle()
   for i in input:
     puzzle.loadConstraints(i)
-  if verbose: click.echo(puzzle)
   click.echo("Solving...")
+  if verbose: click.echo(puzzle)
 
 @cli.command()
 @click.option('-v/-q', '--verbose/--quiet', 'verbose')
