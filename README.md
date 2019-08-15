@@ -8,6 +8,10 @@ My motivation for this is not necessarily to use it to solve puzzles per se;
 it's that usually when I write code to solve a problem, I gain a much better
 understanding of how to solve the problem without code.  Plus, it's fun!
 
+## Current status
+
+Still under initial development.  Doesn't do anything useful yet.
+
 ## Concepts
 
 The input is an initial state called a **puzzle**, consisting of:
