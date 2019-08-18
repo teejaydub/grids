@@ -22,6 +22,7 @@ class Puzzle:
     """
     if constraints is None:
       return
+    print("Loading constraints:", constraints)
     if isinstance(constraints, io.IOBase):
       self.addConstraints(yaml.safe_load(constraints))
     elif isinstance(constraints, list):
@@ -29,15 +30,18 @@ class Puzzle:
         self.addConstraints(constraint)
     elif isinstance(constraints, str):
       self.addConstraintNamed(constraints)
-    elif self.isKnownConstraint(constraints.get('name', None)):
-      # Dictionary of constraint constructor properties + a class name
-      self.addConstraintNamed(constraints['name'], constraints)
+    elif isinstance(constraints, dict):
+      if self.isKnownConstraint(constraints.get('name', None)):
+        # Dictionary of constraint constructor properties + a class name
+        self.addConstraintNamed(constraints['name'], constraints)
+      else:
+        # Absorb all named properties we recognize.
+        self.setDimensions(constraints.get('dimensions', None))
+        self.setSize(constraints.get('size', None))
+        self.setInitial(constraints.get('initial', None))
+        self.addConstraints(constraints.get('constraints', None))
     else:
-      # Absorb all named properties we recognize.
-      self.setDimensions(constraints.get('dimensions', None))
-      self.setSize(constraints.get('size', None))
-      self.setInitial(constraints.get('initial', None))
-      self.addConstraints(constraints.get('constraints', None))
+      click.print("Warning: Unrecognized item", constraints)
 
   def addConstraintNamed(self, c):
     """ Adds a constraint with the given name, if we know it.
@@ -45,7 +49,7 @@ class Puzzle:
         optionally with the suffix ".yml" or ".yaml", load constraints from that file.
         Otherwise, raise an exception.
     """
-
+    print("loading constraint", c)
     for extension in ['', '.yml', '.yaml']:
       if self.tryLoad(c + extension):
         return

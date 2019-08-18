@@ -12,11 +12,26 @@ understanding of how to solve the problem without code.  Plus, it's fun!
 
 Still under initial development.  Doesn't do anything useful yet.
 
+Next to-dos:
+
+* Replace verbose/quiet with a log level, including debug?
+	Or just use temporary print statements that get removed or commented out?
+* Regression test for loading some simple and erroneous constraints
+* Regression test for loading the test Sudoku puzzle
+	Stub out constraints for now
+* Constraint laoding
+* Implement Sudoku constraints
+* Better input error handling
+	Its own exception type, with more helpful context and suggestions?
+
+Small wishes:
+* Assume `.yml` extension for input files
+
 ## Concepts
 
 The input is an initial state called a **puzzle**, consisting of:
 
-* a **rectangular grid** with given dimensions
+* a **rectangular grid** with given dimensions (currently fixed at 2 but could be generalizable in future)
 * a set of **possible symbols** that can be placed in grid squares
 * a set of **constraints** about how symbols must be placed in squares
 * a set of **initial placements**, assignments of symbols to squares.  
