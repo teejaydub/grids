@@ -19,10 +19,18 @@ class Puzzle:
 
   def addConstraints(self, constraints):
     """ Add constraints from various sources, distinguished by type.
+      >>> p = Puzzle()
+      >>> p.addConstraints({'size': [2, 2], 'initial': ['12', '21']})
+      >>> str(p)
+      '[ 12\\n  21 ]'
+      >>> p.addConstraints(['Unknown'])
+      Traceback (most recent call last):
+      ...
+      Exception: Can't find a constraint named Unknown
     """
     if constraints is None:
       return
-    print("Loading constraints:", constraints)
+    # print("Loading constraints:", constraints)
     if isinstance(constraints, io.IOBase):
       self.addConstraints(yaml.safe_load(constraints))
     elif isinstance(constraints, list):

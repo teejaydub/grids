@@ -14,12 +14,10 @@ Still under initial development.  Doesn't do anything useful yet.
 
 Next to-dos:
 
-* Replace verbose/quiet with a log level, including debug?
-	Or just use temporary print statements that get removed or commented out?
-* Regression test for loading some simple and erroneous constraints
-* Regression test for loading the test Sudoku puzzle
-	Stub out constraints for now
 * Constraint laoding
+	Stub out constraints for now
+* Regression test for loading the test Sudoku puzzle
+	https://click.palletsprojects.com/en/7.x/testing/
 * Implement Sudoku constraints
 * Better input error handling
 	Its own exception type, with more helpful context and suggestions?
