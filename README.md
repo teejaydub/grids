@@ -15,10 +15,10 @@ Still under initial development.  Doesn't do anything useful yet.
 Next to-dos:
 
 * Constraint laoding
-	Stub out constraints for now
+* Apply constraints initially after loading
+* Implement Sudoku constraints
 * Regression test for loading the test Sudoku puzzle
 	https://click.palletsprojects.com/en/7.x/testing/
-* Implement Sudoku constraints
 * Better input error handling
 	Its own exception type, with more helpful context and suggestions?
 
@@ -203,6 +203,10 @@ each square with three possible placements, etc.  This is intended to keep the
 tree as small as possible.
 
 ## Constraint classes
+
+The following classes are all derived from `constraints.Constraint`.
+
+To add a new constraint, make sure it's referenced in `constraints/__init__.py`.
 
 ### SymbolsNumericByDiameter
 

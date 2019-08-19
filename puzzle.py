@@ -3,6 +3,8 @@ import io
 import pathlib
 import yaml
 
+from constraints import *
+
 def concatWithSep(elements, sep = ','):
   return sep.join(x for x in elements if x)
 
@@ -10,7 +12,7 @@ class Puzzle:
   """ Holds a set of initial conditions and constriants. 
   """
   def __init__(self):
-    self.constraints = {}
+    self.constraints = []
     self.dimensions = None
     self.size = None
     self.symbols = ['1', '2', '3', '4']  # a list of strings (to do: init to None and set by constraint)
@@ -39,11 +41,11 @@ class Puzzle:
     elif isinstance(constraints, str):
       self.addConstraintNamed(constraints)
     elif isinstance(constraints, dict):
-      if self.isKnownConstraint(constraints.get('name', None)):
+      if 'name' in constraints:
         # Dictionary of constraint constructor properties + a class name
         self.addConstraintNamed(constraints['name'], constraints)
       else:
-        # Absorb all named properties we recognize.
+        # Absorb all named Puzzle properties we recognize.
         self.setDimensions(constraints.get('dimensions', None))
         self.setSize(constraints.get('size', None))
         self.setInitial(constraints.get('initial', None))
@@ -51,8 +53,9 @@ class Puzzle:
     else:
       click.print("Warning: Unrecognized item", constraints)
 
-  def addConstraintNamed(self, c):
+  def addConstraintNamed(self, c, new_args={}):
     """ Adds a constraint with the given name, if we know it.
+        Pass the specified arguments to its constructor.
         Otherwise, if it's the name of a file in theh current directory,
         optionally with the suffix ".yml" or ".yaml", load constraints from that file.
         Otherwise, raise an exception.
@@ -61,7 +64,10 @@ class Puzzle:
     for extension in ['', '.yml', '.yaml']:
       if self.tryLoad(c + extension):
         return
-    raise Exception("Can't find a constraint named " + c)
+    try:
+      self.constraints.append(globals()[c](**new_args))
+    except:
+      raise Exception("Can't find a constraint named " + c)
 
   def tryLoad(self, filename):
     """ If filename exists, load constraints from it and return True.
@@ -98,7 +104,7 @@ class Puzzle:
     elif self.dimensions:
       result = '(' + str(self.dimensions) + "-dimensional)"
     if self.constraints:
-      result = concatWithSep([result, str(self.constraints)], "\n")
+      result = concatWithSep([result, '[' + ', '.join([str(c) for c in self.constraints]) + ']'], "\n")
     if result == '':
       result = "(empty Puzzle)"
     return result
@@ -177,6 +183,3 @@ class Puzzle:
         raise Exception("Can't initialize with list " + str(initial))
     else:
       raise Exception("Can't initialize with " + str(initial))
-
-  def isKnownConstraint(self, constraintName):
-    return False
