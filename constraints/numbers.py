@@ -1,3 +1,5 @@
+import logging
+
 from .constraint import Constraint
 
 class SymbolsNumericDigits(Constraint):
@@ -8,12 +10,17 @@ class SymbolsNumericDigits(Constraint):
 		self.max_digits = max_digits
 
 	def apply(self, puzzle):
-		puzzle.symbols = ['1', '2']
+		puzzle.symbols = [str(x) for x in range(1, self.max_digits + 1)]
+		logging.debug("Setting symbols to %s", puzzle.symbols)
+		return []
 
 class SymbolsNumericByDiameter(Constraint):
 	def apply(self, puzzle):
 		if puzzle.size:
-			return []
+			# Require that the puzzle be square.
+			if puzzle.size[1] != puzzle.size[0]:
+				raise Exception("Puzzle must be square, but its size is %s" % puzzle.size)
+			return [SymbolsNumericDigits(puzzle.size[0])]
 		else:
-			# We can finish whenever the size is known.
+			# We can finish later, whenever the size is known.
 			return [self]
