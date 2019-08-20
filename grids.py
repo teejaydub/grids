@@ -2,6 +2,7 @@
 # Command-line intrface for solving grid-based puzzles.
 
 import click
+import logging
 import puzzle
 
 @click.group()
@@ -12,14 +13,20 @@ def cli():
 
 @cli.command()
 @click.argument('input', type=click.File('rb'), nargs=-1)
-@click.option('-v/-q', '--verbose/--quiet', 'verbose')
-def solve(input, verbose):
+@click.option('-v/-q', '--verbose/--quiet', 'verbose', help="More output")
+@click.option('-d', '--debug', 'debug', is_flag=True, help="Debugging output")
+def solve(input, verbose, debug):
   """ Solve a puzzle specified by one or more INPUT constraints files. """
+  if debug:
+    logging.basicConfig(level=logging.DEBUG)
+  elif verbose:
+    logging.basicConfig(level=logging.INFO)
+
   p = puzzle.Puzzle()
   for i in input:
     p.addConstraints(i)
-  click.echo("Solving...")
-  if verbose: click.echo(p)
+  logging.info("Solving...")
+  logging.info(p)
   if p.solve():
     click.echo("Solved:")
     click.echo(p.formatPlacements(p.solution))

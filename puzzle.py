@@ -1,5 +1,6 @@
 import functools
 import io
+import logging
 import pathlib
 import yaml
 
@@ -33,7 +34,7 @@ class Puzzle:
     """
     if constraints is None:
       return
-    # print("Loading constraints:", constraints)
+    logging.debug("Loading constraints: %s", constraints)
     if isinstance(constraints, io.IOBase):
       self.addConstraints(yaml.safe_load(constraints))
     elif isinstance(constraints, list):
@@ -52,7 +53,7 @@ class Puzzle:
         self.setInitial(constraints.get('initial', None))
         self.addConstraints(constraints.get('constraints', None))
     else:
-      click.print("Warning: Unrecognized item", constraints)
+      logger.warning("Unrecognized item: %s", constraints)
 
   def addConstraintNamed(self, c, new_args={}):
     """ Adds a constraint with the given name, if we know it.
@@ -61,7 +62,7 @@ class Puzzle:
         optionally with the suffix ".yml" or ".yaml", load constraints from that file.
         Otherwise, raise an exception.
     """
-    print("loading constraint", c)
+    logging.debug("loading constraint: %s", c)
     for extension in ['', '.yml', '.yaml']:
       if self.tryLoad(c + extension):
         return
@@ -216,4 +217,4 @@ class Puzzle:
         If not, return False.
     """
     while self.reduceConstraints():
-      print("Reduced:", self.constraintNames())
+      logging.debug("Reduced: %s", self.constraintNames())
