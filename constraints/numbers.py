@@ -13,7 +13,7 @@ class SymbolsNumericDigits(Constraint):
 class SymbolsNumericByDiameter(Constraint):
 	def apply(self, puzzle):
 		if puzzle.size:
-			return True
+			return []
 		else:
 			# We can finish whenever the size is known.
-			return False
+			return [self]

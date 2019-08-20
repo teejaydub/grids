@@ -15,6 +15,7 @@ Still under initial development.  Doesn't do anything useful yet.
 Next to-dos:
 
 * Apply constraints initially after loading
+* Add real logging with levels... it's just getting too complicated.
 * Implement Sudoku constraints
 * Regression test for loading the test Sudoku puzzle
 	https://click.palletsprojects.com/en/7.x/testing/

@@ -66,7 +66,10 @@ class Puzzle:
       if self.tryLoad(c + extension):
         return
     try:
-      self.constraints.append(globals()[c](**new_args))
+      constraintClass = globals()[c]
+      constraint = constraintClass(**new_args)
+      self.constraints.append(constraint)
+      self._constraintsChanged = True
     except:
       raise Exception("Can't find a constraint named " + c)
 
@@ -105,10 +108,14 @@ class Puzzle:
     elif self.dimensions:
       result = '(' + str(self.dimensions) + "-dimensional)"
     if self.constraints:
-      result = concatWithSep([result, '[' + ', '.join([str(c) for c in self.constraints]) + ']'], "\n")
+      result = concatWithSep([result, self.constraintNames()], "\n")
     if result == '':
       result = "(empty Puzzle)"
     return result
+
+  def constraintNames(self):
+    """ Returns a printable list of the current constraint set. """
+    return '[' + ', '.join([str(c) for c in self.constraints]) + ']'
 
   def formatSize(self, size):
     return '(' + functools.reduce(lambda a, b: a + 'x' + b, map(str, self.size)) + ")"
@@ -191,7 +198,17 @@ class Puzzle:
         Return true if something changed - if there are a different set of constraints
         as a result of the reduction.
     """
-    return False
+    # This is the simplest implementation, but it can't tell when anything changes.
+    # self.constraints = [c.apply(self) for c in self.constraints]
+    result = False
+    newConstraints = []
+    for c in self.constraints:
+      changes = c.apply(self)
+      if changes != [c]:
+        result = True
+      newConstraints.extend(changes)
+    self.constraints = newConstraints
+    return result
 
   def solve(self):
     """ Attempt to find a solution to the initial condition and constraints.
@@ -199,4 +216,4 @@ class Puzzle:
         If not, return False.
     """
     while self.reduceConstraints():
-      pass
+      print("Reduced:", self.constraintNames())

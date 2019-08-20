@@ -23,10 +23,14 @@ class Constraint:
 
 	def apply(self, puzzle):
 		""" Apply this constraint to the given puzzle.
-				Return True if the constraint is now finished,
-				False if unfinished.
+				Return a list of the constraints that should now replace this one.
+				If this constraint is unfinished, include it in the return list;
+				otherwise, don't.
+				Also include any additional constraints created by applying.
+
+				Default behavior is for one-time-use constraints.
 		"""
-		return True
+		return []
 
 	def __str__(self):
 		return self.__class__.__name__
