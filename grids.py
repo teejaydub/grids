@@ -20,6 +20,11 @@ def solve(input, verbose):
     p.addConstraints(i)
   click.echo("Solving...")
   if verbose: click.echo(p)
+  if p.solve():
+    click.echo("Solved:")
+    click.echo(p.formatPlacements(p.solution))
+  else:
+    click.echo("Can't solve.")
 
 @cli.command()
 @click.option('-v/-q', '--verbose/--quiet', 'verbose')

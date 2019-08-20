@@ -18,6 +18,7 @@ class Puzzle:
     self.symbols = ['1', '2', '3', '4']  # a list of strings (to do: init to None and set by constraint)
     self.symbolsAreChars = True  # True if all symbols are single-character strings  (to do: default to None and set with symbols)
     self.initial = None  # a list of strings, listed for each dimension
+    self.solution = None
 
   def addConstraints(self, constraints):
     """ Add constraints from various sources, distinguished by type.
@@ -183,3 +184,19 @@ class Puzzle:
         raise Exception("Can't initialize with list " + str(initial))
     else:
       raise Exception("Can't initialize with " + str(initial))
+
+  def reduceConstraints(self):
+    """ Apply all constraints.
+        Remove all the finished ones.
+        Return true if something changed - if there are a different set of constraints
+        as a result of the reduction.
+    """
+    return False
+
+  def solve(self):
+    """ Attempt to find a solution to the initial condition and constraints.
+        If one can be found, return True and put its position in self.solution.
+        If not, return False.
+    """
+    while self.reduceConstraints():
+      pass
