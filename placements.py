@@ -1,13 +1,23 @@
 import logging
 
+def showCell(cell):
+  """ Returns a string representing a given cell's contents.
+      It could be one symbol, or several potential symbols.
+  """
+  if not cell:
+    return '_'
+  if len(cell) == 1:
+    return cell[0]
+  else:
+    return '(' + ' '.join(cell) + ')'
+
 class Placements():
   """ A copy of an entire puzzle grid, with a set of possible symbols for each cell.
       If a cell has only one symbol, it's fully determined.
       If it has no symbols, the puzzle is unsolveable.
   """
-  # A list of lists (for two dimensions), each cell of which contains an indexable containing symbols.
+  # A list of lists (for two dimensions), each cell of which contains a list of possible symbols.
   cells = None
-  symbolsAreChars = True
 
   def __init__(self, initial):
     self.cells = self.parse(initial)
@@ -51,10 +61,7 @@ class Placements():
     return 2
 
   def __str__(self):
-    if self.symbolsAreChars:
-      lines = [''.join(row) for row in self.cells]
-    else:
-      lines = self.cells
+    lines = [' '.join(showCell(col) for col in row) for row in self.cells]
     return '[ ' + "\n  ".join(lines) + ' ]'
 
   def all(self):
@@ -74,3 +81,11 @@ class Placements():
       if len(cell) != 1:
         return False
     return True
+
+  def at(self, coords):
+    """ Returns the contents of the grid cell at the specified coordinates (a list or tuple).
+    """
+    return self.cells[coords[0]][coords[1]]
+
+  def setCell(self, coords, contents):
+    self.cells[coords[0]][coords[1]] = contents

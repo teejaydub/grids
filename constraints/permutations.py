@@ -19,7 +19,25 @@ class RegionPermutesSymbols(Constraint):
     return super().__str__() + ': ' + str(self.symbols) + ' in ' + str(self.region)
 
   def apply(self, puzzle):
+    self.expandStars(puzzle)
+
+    result = self.partition(puzzle)
+    if result: return result
+
+    # If nothing produced new constraints, keep this one.
     return [self]
+
+  def expandStars(self, puzzle):
+    """ Takes every cell in the region that has a '*' in its Placements,
+        replace the '*' with a list of all the symbols.
+    """
+    for coords in self.region:
+      cell = puzzle.solution.at(coords)
+      if cell == '*' or cell == ['*']:
+        puzzle.solution.setCell(coords, self.symbols)
+
+  def partition(self, puzzle):
+    pass
 
 # The remaining classes are useful in providing concise shorthands that expand to the above.
 

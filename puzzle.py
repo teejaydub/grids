@@ -155,6 +155,7 @@ class Puzzle:
     """
     if initial:
       self.initial = Placements(initial)
+      self.solution = self.initial
       self.setSize(self.initial.size())
 
   def reduceConstraints(self):
