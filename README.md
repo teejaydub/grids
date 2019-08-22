@@ -15,10 +15,7 @@ Still under initial development.  Doesn't do anything useful yet.
 Next to-dos:
 
 * Implement Sudoku constraints
-  * Determine when solved
-    * Iterate through an upper-left Region
-      * Add a Grid type?
-  * Set symbolsAreChars appropriately
+* Set symbolsAreChars appropriately
 * Solve a simple puzzle that you can do with successive reduction only.
 
 * Regression test for loading and solving the test Sudoku puzzle

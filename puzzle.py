@@ -190,13 +190,4 @@ class Puzzle:
     """
     if not self.solution:
       return False
-    for cell in self.iterateGrid(self.solution):
-      if len(cell) != 1:
-        return False
-    return True
-
-  def gridCells(self, grid):
-    """ Given a list-of-lists that represents a grid, yield the contents of the cells
-        that are within the size of this puzzle.
-    """
-    return Region(self.size)
+    return self.solution.isSolved()

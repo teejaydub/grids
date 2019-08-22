@@ -34,11 +34,12 @@ class Placements():
         return [list(row.strip()) for row in x]
       elif isinstance(x[0], list):
         # It's an array of arrays.
-        raise Exception("Can''t initialize with nested list yet: " + str(initial))
+        # Assume it's in fully-defined list form.
+        return x
       else:
-        raise Exception("Can't initialize with list " + str(initial))
+        raise Exception("Can't initialize with list " + str(x))
     else:
-      raise Exception("Can't initialize with " + str(initial))
+      raise Exception("Can't initialize with " + str(x))
 
   def size(self):
     """ Returns a two-dimensional array containing the grid size.
@@ -55,3 +56,21 @@ class Placements():
     else:
       lines = self.cells
     return '[ ' + "\n  ".join(lines) + ' ]'
+
+  def all(self):
+    """ Iterate through all cells in the grid """
+    for row in self.cells:
+      for cell in row:
+        yield cell
+
+  def isSolved(self):
+    """ Return True iff all cells contain one item.
+        >>> Placements([['1','2']]).isSolved()
+        True
+        >>> Placements([['1',['2', '3']]]).isSolved()
+        False
+    """
+    for cell in self.all():
+      if len(cell) != 1:
+        return False
+    return True
