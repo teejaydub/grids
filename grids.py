@@ -38,8 +38,10 @@ def solve(input, verbose, debug):
 def test(verbose):
   """ Run regression tests. """
   import doctest
+  from constraints import region
   doctest.testmod(verbose=verbose)
   doctest.testmod(puzzle, verbose=verbose)
+  doctest.testmod(region, verbose=verbose)
 
 if __name__ == "__main__":
   cli()

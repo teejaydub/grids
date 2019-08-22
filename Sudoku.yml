@@ -5,7 +5,7 @@ constraints:
   - EachDimensionIsCompletePermutation
   - name: RegionsAreCompletePermutation
     regions: [
-      a0-c2, a3-c5, a6-c8,
-      d0-f2, d3-f5, d6-f8,
-      g0-i2, g3-i5, g6-i8
+      a1-c3, a4-c6, a7-c9,
+      d1-f3, d4-f6, d7-f9,
+      g1-i3, g4-i6, g7-i9
     ]

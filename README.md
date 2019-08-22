@@ -15,6 +15,10 @@ Still under initial development.  Doesn't do anything useful yet.
 Next to-dos:
 
 * Implement Sudoku constraints
+  * Determine when solved
+  	* Iterate through an upper-left Region
+  		* Add a Grid type?
+  * Set symbolsAreChars appropriately
 * Solve a simple puzzle that you can do with successive reduction only.
 
 * Regression test for loading and solving the test Sudoku puzzle
@@ -105,9 +109,9 @@ contraints:
 	- EachDimensionIsCompletePermutation
 	- name: RegionsAreCompletePermutation
 		regions: [
-			a0-c2, a3-c5, a6-c8,
-			d0-f2, d3-f5, d6-f8,
-			g0-i2, g3-i5, g6-i8
+      a1-c3, a4-c6, a7-c9,
+      d1-f3, d4-f6, d7-f9,
+      g1-i3, g4-i6, g7-i9
 		]
 ```
 
@@ -119,11 +123,10 @@ Some simple rules make it easier to write constraint files for a new puzzle:
 * Specifying the grid size implies its number of dimensions.  You can also
 	specify dimensions without specifying size.  This allows a puzzle class
 	to specify rules for puzzles of varying sizes.
-* As shown above, lists of grid squares can be expressed in letter-number
-	form for two-dimensional grids.  They can also contain ranges of squares,
+* As shown above, lists of grid squares can contain ranges of chess-style squares,
 	expressed as *start square*-*end square*, which are taken to be rectangular
 	in shape and iterate rows and columns through the region listed.  E.g.,
-	"a0-c2" means "a0, a1, a2, b0, b1, b2, c0, c1, c2".
+	"a1-c3" means "a1, a2, a3, b1, b2, b3, c1, c2, c3".
 
 ### Arguments
 

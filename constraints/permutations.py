@@ -15,11 +15,11 @@ class RegionPermutesSymbols(Constraint):
 		self.region = Region(region)
 		self.symbols = symbols
 
-	def apply(self, puzzle):
-		return [self]
-
 	def __str__(self):
 		return super().__str__() + ': ' + str(self.symbols) + ' in ' + str(self.region)
+
+	def apply(self, puzzle):
+		return [self]
 
 # The remaining classes are useful in providing concise shorthands that expand to the above.
 
@@ -58,10 +58,8 @@ class EachDimensionIsCompletePermutation(Constraint):
 			lastCol = chr(ord('1') + puzzle.size[1] - 1)
 			# Rows: like "a1-a9", for a..i
 			regions = [chr(r) + '1-' + chr(r) + lastCol for r in range(ord('a'), ord(lastRow) + 1)]
-			logging.debug("row regions: %s", regions)
 			# Cols: like "a1-i1" for 1..9
 			regions += ['a' + chr(c) + '-' + lastRow + chr(c) for c in range(ord('1'), ord(lastCol) + 1)]
-			logging.debug("row + col regions: %s", regions)
 			return [RegionsAreCompletePermutation(regions)]
 		else:
 			# Can't resolve without the size, so wait for it to be known.

@@ -16,7 +16,7 @@ class Puzzle:
     self.constraints = []
     self.dimensions = None
     self.size = None
-    self.symbols = ['1', '2', '3', '4']  # a list of strings (to do: init to None and set by constraint)
+    self.symbols = None  # a list of strings
     self.symbolsAreChars = True  # True if all symbols are single-character strings  (to do: default to None and set with symbols)
     self.initial = None  # a list of strings, listed for each dimension
     self.solution = None
@@ -218,5 +218,23 @@ class Puzzle:
         If one can be found, return True and put its position in self.solution.
         If not, return False.
     """
+    # Reduce the constraints as far as possible analytically.
     while self.reduceConstraints():
       logging.debug("Reduced: %s", self.constraintNames())
+    return self.isSolved()
+
+  def isSolved(self):
+    """ Return True if the solution is complete - with only one symbol placement per cell.
+    """
+    if not self.solution:
+      return False
+    for cell in self.iterateGrid(self.solution):
+      if len(cell) != 1:
+        return False
+    return True
+
+  def gridCells(self, grid):
+    """ Given a list-of-lists that represents a grid, yield the contents of the cells
+        that are within the size of this puzzle.
+    """
+    return Region(self.size)
