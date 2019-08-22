@@ -16,16 +16,16 @@ Next to-dos:
 
 * Implement Sudoku constraints
   * Determine when solved
-  	* Iterate through an upper-left Region
-  		* Add a Grid type?
+    * Iterate through an upper-left Region
+      * Add a Grid type?
   * Set symbolsAreChars appropriately
 * Solve a simple puzzle that you can do with successive reduction only.
 
 * Regression test for loading and solving the test Sudoku puzzle
-	https://click.palletsprojects.com/en/7.x/testing/
+  https://click.palletsprojects.com/en/7.x/testing/
 
 * Better input error handling
-	Its own exception type, with more helpful context and suggestions?
+  Its own exception type, with more helpful context and suggestions?
 * Allow interactive prompting for initial if it's not provided (or any other missing parameters?)
 
 Small wishes:
@@ -77,42 +77,42 @@ Constraint files are YAML (or JSON as a subset of YAML) with the following
 rules:
 
 * If the top-level content in the file is a list, it's a list of items, each of
-	which can be either the name of another constraint file (with the suffix 
-	`.yml` implied) or a map of `GridPuzzle` attributes.
+  which can be either the name of another constraint file (with the suffix 
+  `.yml` implied) or a map of `GridPuzzle` attributes.
 * If the top-level content is a map, it's a map of `GridPuzzle` attributes.
 * In particular, the `constraints` key contains a list of constraints, each of
-	which names an available Python class that's derived from `Constraint`.
-	If a constraint has a map value, it must have a `name` along with other 
-	arguments, which are passed to the constraint constructor.
+  which names an available Python class that's derived from `Constraint`.
+  If a constraint has a map value, it must have a `name` along with other 
+  arguments, which are passed to the constraint constructor.
 
 Example:
 
 ```YAML
 - Sudoku  # includes constraints from Sudoku.yml
 - initial: |
-	  1****6***
-	  *********
-	  ****7****
-	  ********3
-	  *********
-	  **8******
-	  *********
-	  ******5**
-	  *********
+    1****6***
+    *********
+    ****7****
+    ********3
+    *********
+    **8******
+    *********
+    ******5**
+    *********
 ```
 
 ```YAML
 # Sudoku.yml
 size: [9, 9]
 contraints:
-	- SymbolsNumericByDiameter
-	- EachDimensionIsCompletePermutation
-	- name: RegionsAreCompletePermutation
-		regions: [
+  - SymbolsNumericByDiameter
+  - EachDimensionIsCompletePermutation
+  - name: RegionsAreCompletePermutation
+    regions: [
       a1-c3, a4-c6, a7-c9,
       d1-f3, d4-f6, d7-f9,
       g1-i3, g4-i6, g7-i9
-		]
+    ]
 ```
 
 These are complete definitions of the Sudoku class of puzzles and an
@@ -121,12 +121,12 @@ individual puzzle.
 Some simple rules make it easier to write constraint files for a new puzzle:
 
 * Specifying the grid size implies its number of dimensions.  You can also
-	specify dimensions without specifying size.  This allows a puzzle class
-	to specify rules for puzzles of varying sizes.
+  specify dimensions without specifying size.  This allows a puzzle class
+  to specify rules for puzzles of varying sizes.
 * As shown above, lists of grid squares can contain ranges of chess-style squares,
-	expressed as *start square*-*end square*, which are taken to be rectangular
-	in shape and iterate rows and columns through the region listed.  E.g.,
-	"a1-c3" means "a1, a2, a3, b1, b2, b3, c1, c2, c3".
+  expressed as *start square*-*end square*, which are taken to be rectangular
+  in shape and iterate rows and columns through the region listed.  E.g.,
+  "a1-c3" means "a1, a2, a3, b1, b2, b3, c1, c2, c3".
 
 ### Arguments
 
@@ -138,7 +138,7 @@ specifying one of the following actions:
 * Find a single solution for the puzzle, and output it
 
 * Find a single solution for the puzzle, then back up the search tree as far
-	as possible while still having only one solution, and output the placement.
+  as possible while still having only one solution, and output the placement.
 
 Other options include the verbosity of output describing the search process.
 
@@ -148,14 +148,14 @@ To solve a grid puzzle:
 
 1. Each grid square gets the placement `*`, indicating all symbols are possible.
 2. Constraints are applied.  They can produce additional constraints or modify
-	 the puzzle's attributes.
+   the puzzle's attributes.
 3. The preceding step is repeated until no new changes are produced.
 4. A search tree is explored, choosing one placement for a given square and 
    recursing the constraint proecss.  Tree nodes are eliminated if they 
    result in empty placement lists for any square.
 5. The searh is stopped either when the grid placement is fully specified
-	 (a single symbol in each square), or when there are no more leaves in the
-	 search tree to explore, depending on the command-line arguments.
+   (a single symbol in each square), or when there are no more leaves in the
+   search tree to explore, depending on the command-line arguments.
 
 ## Data structures
 
@@ -173,18 +173,18 @@ A `GridPuzzle` class instance holds all the pieces of the initial state, as
 well as the following additional data while the puzzle is being solved:
 
 * The **current placements** of symbols in the grid, as an array of rows,
-	each of which is an array of columns, each of which is an array of symbols
-	that are known to be possible for the corresponding grid square.
-	This represents the symbols placements that are currently known to be 
-	inferrable from the puzzle's initial state.  Squares with multiple symbols
-	listed can have multiple placements (at the current stage of analysis).
-	These correspond to "pencil marks" in traditional solving techniques.
-	Squares with `*` could have any possible symbol.
+  each of which is an array of columns, each of which is an array of symbols
+  that are known to be possible for the corresponding grid square.
+  This represents the symbols placements that are currently known to be 
+  inferrable from the puzzle's initial state.  Squares with multiple symbols
+  listed can have multiple placements (at the current stage of analysis).
+  These correspond to "pencil marks" in traditional solving techniques.
+  Squares with `*` could have any possible symbol.
 * The **current constraint set**.  The initial constraints may be analyzable
-	to derive further constraints.
+  to derive further constraints.
 * The **search tree** of puzzle state nodes that are being explored under
-	this one.  These are stored as a map from a `Placement` to a resulting 
-	`GridPuzzle`.
+  this one.  These are stored as a map from a `Placement` to a resulting 
+  `GridPuzzle`.
 
 All constraints are child classes of the `Constraint` class.  Constraints have
 the following key methods:
@@ -229,7 +229,7 @@ consisting of each row and each column, up to the number of dimensions.
 Constructor arguments:
 
 * `regions` - A list of grid squares that this constraint applies to.  Can be
-	parsed from the YAML input styles described above.
+  parsed from the YAML input styles described above.
 
 #### RegionsAreCompletePermutation
 
