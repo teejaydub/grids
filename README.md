@@ -15,8 +15,11 @@ Still under initial development.  Doesn't do anything useful yet.
 Next to-dos:
 
 * Implement Sudoku constraints
-* Regression test for loading the test Sudoku puzzle
+* Solve a simple puzzle that you can do with successive reduction only.
+
+* Regression test for loading and solving the test Sudoku puzzle
 	https://click.palletsprojects.com/en/7.x/testing/
+
 * Better input error handling
 	Its own exception type, with more helpful context and suggestions?
 * Allow interactive prompting for initial if it's not provided (or any other missing parameters?)
@@ -102,9 +105,9 @@ contraints:
 	- EachDimensionIsCompletePermutation
 	- name: RegionsAreCompletePermutation
 		regions: [
-			[a0-c2], [a3-c5], [a6-c8],
-			[d0-f2], [d3-f5], [d6-f8],
-			[g0-i2], [g3-i5], [g6-i8]
+			a0-c2, a3-c5, a6-c8,
+			d0-f2, d3-f5, d6-f8,
+			g0-i2, g3-i5, g6-i8
 		]
 ```
 

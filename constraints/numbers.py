@@ -15,6 +15,9 @@ class SymbolsNumericDigits(Constraint):
 		return []
 
 class SymbolsNumericByDiameter(Constraint):
+	""" Sets the symbol set to the diameter of the puzzle.
+			Requires that the puzzle be square.
+	"""
 	def apply(self, puzzle):
 		if puzzle.size:
 			# Require that the puzzle be square.

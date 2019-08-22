@@ -68,6 +68,8 @@ class Puzzle:
         return
     try:
       constraintClass = globals()[c]
+      if 'name' in new_args:
+        del new_args['name']  # so it doesn't get passed as an argument to the constraint constructor
       constraint = constraintClass(**new_args)
       self.constraints.append(constraint)
       self._constraintsChanged = True
