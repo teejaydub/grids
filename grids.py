@@ -28,12 +28,12 @@ def solve(input, verbose, debug):
   if verbose:
     click.echo("Puzzle:")
     click.echo(p)
-    click.echo("Solving...")
+    click.echo("\nSolving...")
   if p.solve():
-    click.echo("Solved:")
+    click.echo("\nSolved:")
     click.echo(str(p.solution))
   else:
-    click.echo("Can't solve.")
+    click.echo("\nCan't solve.")
     if p.solution:
       click.echo("Best solution:")
       click.echo(p.solution)
