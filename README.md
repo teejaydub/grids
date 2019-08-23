@@ -10,14 +10,16 @@ understanding of how to solve the problem without code.  Plus, it's fun!
 
 ## Current status
 
-Solves easy-level Sudoku with the single "partition" technique.
+Solves easy-level Sudoku with the "partition," "solo," and "borrow"
+techniques.
 
 Next to-dos:
 
 * Better solving
   * Add more solving techniques and test with harder Sudokus
-    * More status on solving: number of reduction steps, time
     * Permutation techniques that operate between constraints
+      * solo technique
+    * More status on solving: number of reduction steps, time
     * Associate difficulty levels with techniques, so we can report how hard it was to solve
     * Tree traversal, starting with 2-symbol cells
   * Add Sixy Sudoku puzzle type - should need no further code

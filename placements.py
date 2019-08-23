@@ -82,24 +82,27 @@ class Placements():
         return False
     return True
 
-  def at(self, coords):
+  def at(self, location):
     """ Returns the contents of the grid cell at the specified coordinates (a list or tuple).
     """
-    return self.cells[coords[0]][coords[1]]
+    return self.cells[location[0]][location[1]]
 
-  def setCell(self, coords, contents):
-    self.cells[coords[0]][coords[1]] = contents
+  def setCell(self, location, contents):
+    if isinstance(contents, str):
+      # If I set it to a single symbol, make it into a list.
+      contents = [contents]
+    self.cells[location[0]][location[1]] = contents
 
-  def eliminateAt(self, coords, symbols):
+  def eliminateAt(self, location, symbols):
     """ Remove the given list of symbols from this placement 
         at the given coordinates.
     """
-    cell = self.cells[coords[0]][coords[1]]
-    self.setCell(coords, [s for s in cell if not s in symbols])
+    cell = self.cells[location[0]][location[1]]
+    self.setCell(location, [s for s in cell if not s in symbols])
 
   def eliminateThroughout(self, locations, symbols):
     """ Remove the given list of symbols from this placement
-        everywhere within the given list of locations.
+        everywhere within the given list of locations (which can be a Region).
     """
     for location in locations:
       self.eliminateAt(location, symbols)

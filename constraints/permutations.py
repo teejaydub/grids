@@ -50,6 +50,9 @@ class RegionPermutesSymbols(Constraint):
     result = self.partition(puzzle)
     if result is not None: return result
 
+    result = self.solo(puzzle)
+    if result is not None: return result
+
     result = self.borrow(puzzle)
     if result is not None: return result
 
@@ -92,17 +95,39 @@ class RegionPermutesSymbols(Constraint):
       if len(subset) == len(coordList):
         # There are the same number of symbols in this set as cells to put them in.
         # So, the given coordList can be partitioned off from the rest of the region.
-        remainderLocations = subtractLists(self.region.cells, coordList)
-        remainderSymbols = subtractLists(self.symbols, subset)
+        remainder = self.remainder(coordList, subset)
         logging.debug("Partitioning out %s in %s, leaving %s in %s", 
-          subset, coordList, remainderSymbols, remainderLocations)
-        result = [RegionPermutesSymbols(coordList, subset), 
-          RegionPermutesSymbols(remainderLocations, remainderSymbols)]
+          subset, coordList, remainder.symbols, remainder.region)
+        result = [RegionPermutesSymbols(coordList, subset), remainder]
 
         # We cank also remove all the subset symbols from the remainder region.
-        puzzle.solution.eliminateThroughout(remainderLocations, subset)
+        puzzle.solution.eliminateThroughout(remainder.region, subset)
 
         return result
+
+  def solo(self, puzzle):
+    """ Look for a symbol that only occurs in one place within the region.
+        Everything else can be eliminated from that cell, 
+        and we can replace this constraint with a new one excluding that cell and symbol.
+    """
+    # First, count how many times each symbol appears in our region.
+    index = {}
+    for cell in self.region:
+      for s in puzzle.solution.at(cell):
+        if s in index:
+          index[s].append(cell)
+        else:
+          index[s] = [cell]
+    logging.debug("solo: index: %s", index)
+
+    # Now, find the first solo symbol.
+    for s, locations in index.items():
+      if len(locations) == 1:
+        puzzle.solution.setCell(locations[0], s)
+        remainder = self.remainder(locations, [s])
+        logging.debug("Solo: %s must be %s, since it can't occur elsewhere in %s",
+          locations[0], s, self.region)
+        return [remainder]
 
   def borrow(self, puzzle):
     """ Look for another permutation constraint whose region is a subset of this one.
@@ -113,12 +138,28 @@ class RegionPermutesSymbols(Constraint):
     for constraint in puzzle.constraints:
       if isinstance(constraint, RegionPermutesSymbols):
         if constraint.region.isProperSubsetOf(self.region):
-          remainderLocations = subtractLists(self.region.cells, constraint.region.cells)
-          remainderSymbols = subtractLists(self.symbols, constraint.symbols)
+          remainder = self.remainderConstraint(constraint)
           logging.debug("Borrowing %s from %s, leaving %s in %s", 
-            constraint.symbols, constraint.region.cells, remainderSymbols, remainderLocations)
-          puzzle.solution.eliminateThroughout(remainderLocations, constraint.symbols)
-          return [RegionPermutesSymbols(remainderLocations, remainderSymbols)]
+            constraint.symbols, constraint.region, remainder.symbols, remainder.region)
+          puzzle.solution.eliminateThroughout(remainder.region, constraint.symbols)
+          return [remainder]
+
+
+  # Utility functions:
+
+  def remainder(self, locations, symbols):
+    """ Return a new RegionPermutesSymbols constraint, by subtracting the given locations and symbols
+        from this region's locations and symbols.
+    """
+    remainderLocations = subtractLists(self.region.cells, locations)
+    remainderSymbols = subtractLists(self.symbols, symbols)
+    return RegionPermutesSymbols(remainderLocations, remainderSymbols)
+
+  def remainderConstraint(self, other):
+    """ Return a new RegionPermutesSymbols constraint, subtracting out the regions and symbol sets
+        in `other` from those in `self`.
+    """
+    return self.remainder(other.region, other.symbols)
 
 # The remaining classes are useful in providing concise shorthands that expand to the above.
 
