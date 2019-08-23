@@ -42,6 +42,8 @@ def solve(input, verbose, debug):
 @click.option('-v/-q', '--verbose/--quiet', 'verbose')
 def test(verbose):
   """ Run regression tests. """
+
+  # Using docstrings:
   import doctest
   import placements
   from constraints import region, permutations
@@ -50,6 +52,26 @@ def test(verbose):
   doctest.testmod(region, verbose=verbose)
   doctest.testmod(placements, verbose=verbose)
   doctest.testmod(permutations, verbose=verbose)
+
+  # Test command-line interface and solving:
+  from click.testing import CliRunner
+  runner = CliRunner()
+
+  result = runner.invoke(cli, ['solve', 'su-test-1.yml'])
+  assert result.exit_code == 0
+  assert 'Solved' in result.output
+  assert """
+Solved:
+[ 9 5 3 4 1 2 6 7 8
+  4 1 8 5 6 7 2 3 9
+  7 2 6 3 9 8 1 4 5
+  6 8 4 1 2 5 7 9 3
+  5 7 1 8 3 9 4 6 2
+  3 9 2 6 7 4 5 8 1
+  1 4 5 9 8 6 3 2 7
+  2 6 9 7 5 3 8 1 4
+  8 3 7 2 4 1 9 5 6 ]
+""" in result.output
 
 if __name__ == "__main__":
   cli()

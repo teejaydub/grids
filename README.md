@@ -14,17 +14,19 @@ Solves easy-level Sudoku with the single "partition" technique.
 
 Next to-dos:
 
-* Regression test for loading and solving the test "easy" level Sudoku puzzle
-  https://click.palletsprojects.com/en/7.x/testing/
-
 * Better solving
   * Add more solving techniques and test with harder Sudokus
-    Permutation techniques that operate between constraints
-    Tree traversal, starting with 2-symbol cells
+    * Permutation techniques that operate between constraints
+    * Associate difficulty levels with techniques, so we can report how hard it was to solve
+    * More status on solving: number of reduction steps
+    * Tree traversal, starting with 2-symbol cells
   * Add Sixy Sudoku puzzle type - should need no further code
   * Add constraint types for KenKen, KaKuRo
 * Puzzle creation
 * Code improvements
+  * In -d mode, only report the placing of a single symbol in a single cell one time
+  * Rename 'coords' to 'locadtion' throughout
+  * Use logging for verbose output - just remove the prefixes from the format?
   * symbolsAreChars: simplify output further?  Simplify input?
   * Better input error handling
     Its own exception type, with more helpful context and suggestions?
