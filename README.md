@@ -10,37 +10,41 @@ understanding of how to solve the problem without code.  Plus, it's fun!
 
 ## Current status
 
-Still under initial development.  Doesn't do anything useful yet.
+Solves easy-level Sudoku with the single "partition" technique.
 
 Next to-dos:
 
-* Implement Sudoku constraints
-* Set symbolsAreChars appropriately
-* Solve a simple puzzle that you can do with successive reduction only.
-
-* Regression test for loading and solving the test Sudoku puzzle
+* Regression test for loading and solving the test "easy" level Sudoku puzzle
   https://click.palletsprojects.com/en/7.x/testing/
 
-* Better input error handling
-  Its own exception type, with more helpful context and suggestions?
-* Allow interactive prompting for initial if it's not provided (or any other missing parameters?)
-
-Small wishes:
-* Assume `.yml` extension for input files
+* Better solving
+  * Add more solving techniques and test with harder Sudokus
+    Permutation techniques that operate between constraints
+    Tree traversal, starting with 2-symbol cells
+  * Add Sixy Sudoku puzzle type - should need no further code
+  * Add constraint types for KenKen, KaKuRo
+* Puzzle creation
+* Code improvements
+  * symbolsAreChars: simplify output further?  Simplify input?
+  * Better input error handling
+    Its own exception type, with more helpful context and suggestions?
+* Ease of use
+  * Allow interactive prompting for initial if it's not provided (or any other missing parameters?)
+  * Assume `.yml` extension for input files
 
 ## Concepts
 
 The input is an initial state called a **puzzle**, consisting of:
 
-* a **rectangular grid** with given dimensions (currently fixed at 2 but could be generalizable in future)
-* a set of **possible symbols** that can be placed in grid squares
-* a set of **constraints** about how symbols must be placed in squares
-* a set of **initial placements**, assignments of symbols to squares.  
+* a **rectangular grid** of **cells** with given dimensions (currently fixed at 2 but could be generalizable in future)
+* a set of **possible symbols** that can be placed in grid cells
+* a set of **constraints** about how symbols must be placed in cells
+* a set of **initial placements**, assignments of symbols to cells.  
   Initial placements can be represented as a kind of constraint.
 
 The goal is to enumerate the possible **solutions** to the initial state; a
-solution is an assignment of one symbol to each square of the grid that
-satisfies all the constaints.
+solution is an placement of one symbol to each cell of the grid that
+satisfies all the constraints.
 
 Traditional grid puzzles are meant to have a unique solution.
 
@@ -48,7 +52,7 @@ Traditional grid puzzles are meant to have a unique solution.
 
 Constraints are where much of the conceptual complexity of the framework
 resides.  New types of puzzles and new techniques for solving them efficiently
-are expressed as new types of constraints.  
+are expressed as new types of constraints.
 
 Constraints can be represented in terms of other constraints that they imply,
 so both composition and specialization are used to structure the constraint
@@ -58,7 +62,7 @@ See the **Constraint types** section below.
 
 ## Command line interface
 
-When run at the command line, the program takes a puzzle, solves it, and
+When run with the "solve" command, the program takes a puzzle, solves it, and
 ouptuts the solution(s) to stdout.
 
 Input is via one or more **constraint files**, each of which adds constraints
@@ -75,8 +79,8 @@ rules:
 
 * If the top-level content in the file is a list, it's a list of items, each of
   which can be either the name of another constraint file (with the suffix 
-  `.yml` implied) or a map of `GridPuzzle` attributes.
-* If the top-level content is a map, it's a map of `GridPuzzle` attributes.
+  `.yml` implied) or a map of `Puzzle` attributes.
+* If the top-level content is a map, it's a map of `Puzzle` attributes.
 * In particular, the `constraints` key contains a list of constraints, each of
   which names an available Python class that's derived from `Constraint`.
   If a constraint has a map value, it must have a `name` along with other 
@@ -87,15 +91,15 @@ Example:
 ```YAML
 - Sudoku  # includes constraints from Sudoku.yml
 - initial: |
-    1****6***
-    *********
-    ****7****
-    ********3
-    *********
-    **8******
-    *********
-    ******5**
-    *********
+    **3*1****
+    4**56*2*9
+    7****81**
+    *8*1****3
+    **18*94**
+    3****4*8*
+    **59****7
+    2*9*53**4
+    ****4*9**
 ```
 
 ```YAML
@@ -130,8 +134,6 @@ Some simple rules make it easier to write constraint files for a new puzzle:
 Command-line arguments are listed in the `--help` text.  They include
 specifying one of the following actions:
 
-* Solve the puzzle completely, and output all solutions
-
 * Find a single solution for the puzzle, and output it
 
 * Find a single solution for the puzzle, then back up the search tree as far
@@ -160,49 +162,51 @@ Symbols are represented as strings.  In puzzles using numbers where
 mathematical values are significant, constraints convert the symbol values to
 numbers as needed.
 
-A `Location` is a tuple of coordinates, indexed from 0.  For two-dimensional
-grids, the order is row-major, so the first coordinate is the row, and the
-second is the column.
+A **location** (not defined as a class) is a tuple of coordinates, indexed
+from 0.  For two-dimensional grids, the order is row-major, so the first
+coordinate is the row, and the second is the column.
 
-A `Placement` is a pair of a `Location` with a symbol.
+A `Region` is a list of locations.
 
-A `GridPuzzle` class instance holds all the pieces of the initial state, as
-well as the following additional data while the puzzle is being solved:
+A `Placements` class lists all grid cells in the puzzle and the symbols that
+can be placed in each.  Each cell contains a list of possible symbols.  If a
+cell contains the single symbol `*`, it can contain any symbol in the puzzle
+(convenient in cases where we don't yet know what symbols the puzzle can use).
+Otherwise, a cell with one symbol is fully-determined, and a cell with
+multiple symbols could have multiple possible symbols at the current stage of
+analysis; these correspond to "pencil marks" in traditional solving
+techniques.
 
-* The **current placements** of symbols in the grid, as an array of rows,
-  each of which is an array of columns, each of which is an array of symbols
-  that are known to be possible for the corresponding grid square.
-  This represents the symbols placements that are currently known to be 
-  inferrable from the puzzle's initial state.  Squares with multiple symbols
-  listed can have multiple placements (at the current stage of analysis).
-  These correspond to "pencil marks" in traditional solving techniques.
-  Squares with `*` could have any possible symbol.
+A `Puzzle` class instance holds all the pieces of the initial state, as well
+as the following additional data while the puzzle is being solved:
+
+* The **current solution**, as a `Placements` instance.
 * The **current constraint set**.  The initial constraints may be analyzable
-  to derive further constraints.
+  to derive further constraints, which may replace or augment the initial ones.
 * The **search tree** of puzzle state nodes that are being explored under
-  this one.  These are stored as a map from a `Placement` to a resulting 
-  `GridPuzzle`.
+  this one.
 
 All constraints are child classes of the `Constraint` class.  Constraints have
-the following key methods:
+one main method, `apply()`.  This can modify aspects of the puzzle, like the
+dimensions or symbol set.  It can also modify the solution.  It returns a list
+of constraints to replace itself with; if the return value is a list
+containing only itself, it will be kept as is.  If the old constraint is not
+within the list of returned constraints, it is removed from the list.
 
-`ModifyPuzzle` - Modify aspects of the puzzle, like the size or symbol set.
+Constraints should not modify themselves during `apply()`; rather, they should
+create new constraint instances with modified data and return those.
 
-`GenerateConstraints(gridPuzzle)` - Look at the current list of constraints
-and placements, and return a tuple of the additional constraints that can be
-inferred, and constraints that can be deleted.
-
-`EliminatePlacements(gridPuzzle)` - Remove symbols from grid squares as
-possible.
-
+This method ensures helps in tracking the solving process, knowing when
+there's nothing left to be done, and in constructing and managing search
+trees.
 
 ## Heuristic choices
 
-Search tree generation is done in increasing order of the number of possible
-placements per square, e.g.,  the entire tree (all leaf nodes) is expanded for
-each square with two possible placements, then the entire tree is expanded for
-each square with three possible placements, etc.  This is intended to keep the
-tree as small as possible.
+Brute-force search tree generation is done in increasing order of the number
+of possible placements per square, e.g.,  the entire tree (all leaf nodes) is
+expanded for each square with two possible placements, then the entire tree is
+expanded for each square with three possible placements, etc.  This is
+intended to keep the tree as small as possible.
 
 ## Constraint classes
 
@@ -213,34 +217,35 @@ To add a new constraint, make sure it's referenced in `constraints/__init__.py`.
 ### SymbolsNumericByDiameter
 
 When the size of the puzzle is known, sets the symbol set to the numbers from
-1 to the diameter.  The diameter is the size in  any dimension, but if any
-dimensions have different sizes, raise an exception.
+1 to the diameter.  The diameter is the size in any dimension.  Requires that
+the size be equal in all dimensions.
 
 ### EachDimensionIsCompletePermutation
 
 Creates a `RegionsAreCompletePermutation` constraint, with a region list
 consisting of each row and each column, up to the number of dimensions.
 
-### RegionConstraint
-
-Constructor arguments:
-
-* `regions` - A list of grid squares that this constraint applies to.  Can be
-  parsed from the YAML input styles described above.
-
-#### RegionsAreCompletePermutation
-
-A `RegionConstraint`.
+### RegionsAreCompletePermutation
 
 Each region listed must contain exactly one of each symbol in the symbol set.
 An exception is raised if any region is not the same size as the symbol set.
 
-### MathOpConstraint
+### RegionIsCompletePermutation
 
-A `RegionConstraint`.
+The same, but including only a single region.
+
+### RegionPermutesSymbols
+
+The same, but with a subset of the puzzle's full symbol set.
+
+This class is where all the solving techniques are implemented for `Region`
+constraints; other constraints reduce to this one.
+
+### MathOpConstraint
 
 Constructor arguments:
 
+* `region` that the constraint applies to
 * `operator` - A function applied to the numeric values of all symbols in the region.
 * `target` - A numeric value that the operator must return.
 
