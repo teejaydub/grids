@@ -65,3 +65,15 @@ class Region():
     """ Yield the coordinate tuples in the Region. """
     for cell in self.cells:
       yield cell
+
+  def isProperSubsetOf(self, other):
+    """ Returns True iff other is a Region whose cells are all within ours,
+        and it's also smaller.
+    """
+    if isinstance(other, Region):
+      if len(other.cells) < len(self.cells):
+        for cell in other.cells:
+          if not cell in self.cells:
+            return False
+        return True
+    return False

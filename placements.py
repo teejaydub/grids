@@ -91,8 +91,15 @@ class Placements():
     self.cells[coords[0]][coords[1]] = contents
 
   def eliminateAt(self, coords, symbols):
-    """ Remove all symbols from the given symbol list from this placement 
+    """ Remove the given list of symbols from this placement 
         at the given coordinates.
     """
     cell = self.cells[coords[0]][coords[1]]
     self.setCell(coords, [s for s in cell if not s in symbols])
+
+  def eliminateThroughout(self, locations, symbols):
+    """ Remove the given list of symbols from this placement
+        everywhere within the given list of locations.
+    """
+    for location in locations:
+      self.eliminateAt(location, symbols)

@@ -50,6 +50,9 @@ class RegionPermutesSymbols(Constraint):
     result = self.partition(puzzle)
     if result is not None: return result
 
+    result = self.borrow(puzzle)
+    if result is not None: return result
+
     # If nothing produced new constraints, keep this one.
     return [self]
 
@@ -89,18 +92,33 @@ class RegionPermutesSymbols(Constraint):
       if len(subset) == len(coordList):
         # There are the same number of symbols in this set as cells to put them in.
         # So, the given coordList can be partitioned off from the rest of the region.
-        remainderRegion = subtractLists(self.region.cells, coordList)
+        remainderLocations = subtractLists(self.region.cells, coordList)
         remainderSymbols = subtractLists(self.symbols, subset)
         logging.debug("Partitioning out %s in %s, leaving %s in %s", 
-          subset, coordList, remainderSymbols, remainderRegion)
+          subset, coordList, remainderSymbols, remainderLocations)
         result = [RegionPermutesSymbols(coordList, subset), 
-          RegionPermutesSymbols(remainderRegion, remainderSymbols)]
+          RegionPermutesSymbols(remainderLocations, remainderSymbols)]
 
         # We cank also remove all the subset symbols from the remainder region.
-        for location in remainderRegion:
-          puzzle.solution.eliminateAt(location, subset)
+        puzzle.solution.eliminateThroughout(remainderLocations, subset)
 
         return result
+
+  def borrow(self, puzzle):
+    """ Look for another permutation constraint whose region is a subset of this one.
+        We can eliminate those symbols from all our cells NOT in that region.
+        Then we can replace this constraint with a new one that doesn't include that region or its symbols.
+        Returns a list containing the new constraint, or None if no such constraints were found.
+    """
+    for constraint in puzzle.constraints:
+      if isinstance(constraint, RegionPermutesSymbols):
+        if constraint.region.isProperSubsetOf(self.region):
+          remainderLocations = subtractLists(self.region.cells, constraint.region.cells)
+          remainderSymbols = subtractLists(self.symbols, constraint.symbols)
+          logging.debug("Borrowing %s from %s, leaving %s in %s", 
+            constraint.symbols, constraint.region.cells, remainderSymbols, remainderLocations)
+          puzzle.solution.eliminateThroughout(remainderLocations, constraint.symbols)
+          return [RegionPermutesSymbols(remainderLocations, remainderSymbols)]
 
 # The remaining classes are useful in providing concise shorthands that expand to the above.
 
