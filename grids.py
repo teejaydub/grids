@@ -25,7 +25,7 @@ def solve(input, verbose, debug):
   p = puzzle.Puzzle()
   for i in input:
     p.addConstraints(i)
-  if verbose:
+  if verbose or debug:
     click.echo("Puzzle:")
     click.echo(p)
     click.echo("\nSolving...")
@@ -44,11 +44,12 @@ def test(verbose):
   """ Run regression tests. """
   import doctest
   import placements
-  from constraints import region
+  from constraints import region, permutations
   doctest.testmod(verbose=verbose)
   doctest.testmod(puzzle, verbose=verbose)
   doctest.testmod(region, verbose=verbose)
   doctest.testmod(placements, verbose=verbose)
+  doctest.testmod(permutations, verbose=verbose)
 
 if __name__ == "__main__":
   cli()

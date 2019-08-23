@@ -3,6 +3,17 @@ import logging
 from .constraint import Constraint
 from .region import Region
 
+def subtractLists(alist, blist):
+  """ Return list a with all elements that match an element in b removed.
+      >>> subtractLists([1, 2, 3], [3])
+      [1, 2]
+      >>> subtractLists(['1', '2', '3'], ['1'])
+      ['2', '3']
+      >>> subtractLists([[0, 0], [0, 1]], [[0, 0]])
+      [[0, 1]]
+  """
+  return [a for a in alist if not a in blist]
+
 class RegionPermutesSymbols(Constraint):
   """ The core logic for regions containing each symbol in a set,
       where each symbol appears in exactly one square in the region.
@@ -14,8 +25,9 @@ class RegionPermutesSymbols(Constraint):
     """
     self.region = Region(region)
     self.symbols = symbols
+    logging.debug("RegionPermutesSymbols(%s, %s)", region, symbols)
     if len(symbols) != len(self.region.cells):
-      raise Exception("Can't permute " + str(len(symbols)) + " into " + str(len(self.region.cells)) + " cells")
+      raise Exception("Can't permute " + str(len(symbols)) + " symbols into " + str(len(self.region.cells)) + " cells")
 
   def __str__(self):
     return super().__str__() + ': ' + str(self.symbols) + ' in ' + str(self.region)
@@ -23,8 +35,19 @@ class RegionPermutesSymbols(Constraint):
   def apply(self, puzzle):
     self.expandStars(puzzle)
 
+    if len(self.symbols) == 0:  # Nothing to do, so finish this constraint
+      logging.debug("discarding empty region")
+      return []
+
+    if len(self.symbols) == 1:  # Only one symbols is possible
+      # We can't get here unless there's also exactly one cell in the region.
+      # Set that in the solution, and then we're done with this constraint.
+      logging.debug("Placing %s at %s", self.symbols[0], self.region.cells[0])
+      puzzle.solution.setCell(self.region.cells[0], self.symbols)
+      return []
+
     result = self.partition(puzzle)
-    if result: return result
+    if result is not None: return result
 
     # If nothing produced new constraints, keep this one.
     return [self]
@@ -49,8 +72,34 @@ class RegionPermutesSymbols(Constraint):
         Returns constraints for those two regions as soon as the condition is found.
         (That may not be the most efficient option, but it does simplify the logic.)
     """
-    for n in range(1, len(self.symbols)):
-      pass
+    # First, index the contents.
+    index = {}  # maps a set of symbols to the coordinates at which they appear.
+    for coords in self.region:
+      subset = puzzle.solution.at(coords)
+      if len(subset) < len(self.symbols):
+        symbols = '|'.join(subset)
+        if symbols in index:
+          index[symbols].append(coords)
+        else:
+          index[symbols] = [coords]
+
+    for symbols, coordList in index.items():
+      subset = symbols.split('|')
+      if len(subset) == len(coordList):
+        # There are the same number of symbols in this set as cells to put them in.
+        # So, the given coordList can be partitioned off from the rest of the region.
+        remainderRegion = subtractLists(self.region.cells, coordList)
+        remainderSymbols = subtractLists(self.symbols, subset)
+        logging.debug("Partitioning out %s in %s, leaving %s in %s", 
+          subset, coordList, remainderSymbols, remainderRegion)
+        result = [RegionPermutesSymbols(coordList, subset), 
+          RegionPermutesSymbols(remainderRegion, remainderSymbols)]
+
+        # We cank also remove all the subset symbols from the remainder region.
+        for coords in remainderRegion:
+          puzzle.solution.eliminateAt(coords, subset)
+
+        return result
 
 # The remaining classes are useful in providing concise shorthands that expand to the above.
 

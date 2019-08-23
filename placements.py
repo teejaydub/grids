@@ -89,3 +89,10 @@ class Placements():
 
   def setCell(self, coords, contents):
     self.cells[coords[0]][coords[1]] = contents
+
+  def eliminateAt(self, coords, symbols):
+    """ Remove all symbols from the given symbol list from this placement 
+        at the given coordinates.
+    """
+    cell = self.cells[coords[0]][coords[1]]
+    self.setCell(coords, [s for s in cell if not s in symbols])
