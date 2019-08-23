@@ -14,6 +14,8 @@ class RegionPermutesSymbols(Constraint):
     """
     self.region = Region(region)
     self.symbols = symbols
+    if len(symbols) != len(self.region.cells):
+      raise Exception("Can't permute " + str(len(symbols)) + " into " + str(len(self.region.cells)) + " cells")
 
   def __str__(self):
     return super().__str__() + ': ' + str(self.symbols) + ' in ' + str(self.region)
@@ -27,8 +29,10 @@ class RegionPermutesSymbols(Constraint):
     # If nothing produced new constraints, keep this one.
     return [self]
 
+# Steps in solving the puzzle
+
   def expandStars(self, puzzle):
-    """ Takes every cell in the region that has a '*' in its Placements,
+    """ For every cell in the region that has a '*' in its Placements,
         replace the '*' with a list of all the symbols.
     """
     for coords in self.region:
@@ -37,7 +41,16 @@ class RegionPermutesSymbols(Constraint):
         puzzle.solution.setCell(coords, self.symbols)
 
   def partition(self, puzzle):
-    pass
+    """ For every group of n cells that contain the same n symbols and no others,
+        partition the region into two new regions:
+        - the "limited" region that contains those n cells and symbols, and
+        - the "remainder" region that contains the other cells and the other symbols.
+        For n = 1, this takes care of removing "settled" symbols from the remainder of the region.
+        Returns constraints for those two regions as soon as the condition is found.
+        (That may not be the most efficient option, but it does simplify the logic.)
+    """
+    for n in range(1, len(self.symbols)):
+      pass
 
 # The remaining classes are useful in providing concise shorthands that expand to the above.
 

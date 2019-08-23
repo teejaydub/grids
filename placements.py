@@ -26,11 +26,11 @@ class Placements():
     """ Returns grid contents matching the input.
         Handles multiple formats:
           >>> print(Placements(['12', '21']))  # array of strings, one per row, with one char per column
-          [ 12
-            21 ]
+          [ 1 2
+            2 1 ]
           >>> print(Placements(" 12 \\n 34"))  # a single string, with rows separated by newlines
-          [ 12
-            34 ]
+          [ 1 2
+            3 4 ]
     """
     if x is None:
       logging.debug("Initializing Placements from None")

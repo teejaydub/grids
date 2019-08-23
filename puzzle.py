@@ -27,7 +27,7 @@ class Puzzle:
       >>> p = Puzzle()
       >>> p.addConstraints({'size': [2, 2], 'initial': ['12', '21']})
       >>> str(p)
-      '[ 12\\n  21 ]'
+      '[ 1 2\\n  2 1 ]'
       >>> p.addConstraints(['Unknown'])
       Traceback (most recent call last):
       ...
@@ -100,8 +100,8 @@ class Puzzle:
       (2x2)
       >>> p.setInitial(['12', '34'])
       >>> print(p)
-      [ 12
-        34 ]
+      [ 1 2
+        3 4 ]
     """
     result = ''
     if self.initial:
@@ -146,12 +146,12 @@ class Puzzle:
           >>> p = Puzzle()
           >>> p.setInitial(['12', '21'])  # array of strings, one per row, with one char per column
           >>> print(p)
-          [ 12
-            21 ]
+          [ 1 2
+            2 1 ]
           >>> p.setInitial(" 12 \\n 34")  # a single string, with rows separated by newlines
           >>> print(p)
-          [ 12
-            34 ]
+          [ 1 2
+            3 4 ]
     """
     if initial:
       self.initial = Placements(initial)
