@@ -25,8 +25,10 @@ def solve(input, verbose, debug):
   p = puzzle.Puzzle()
   for i in input:
     p.addConstraints(i)
-  logging.info("Solving...")
-  logging.info(p)
+  if verbose:
+    click.echo("Puzzle:")
+    click.echo(p)
+    click.echo("Solving...")
   if p.solve():
     click.echo("Solved:")
     click.echo(str(p.solution))
