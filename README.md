@@ -16,23 +16,22 @@ Next to-dos:
 
 * Better solving
   * Add more solving techniques and test with harder Sudokus
+    * More status on solving: number of reduction steps, time
     * Permutation techniques that operate between constraints
     * Associate difficulty levels with techniques, so we can report how hard it was to solve
-    * More status on solving: number of reduction steps
     * Tree traversal, starting with 2-symbol cells
   * Add Sixy Sudoku puzzle type - should need no further code
   * Add constraint types for KenKen, KaKuRo
-* Puzzle creation
+* Puzzle creation, with target difficulty
 * Code improvements
-  * In -d mode, only report the placing of a single symbol in a single cell one time
-  * Rename 'coords' to 'locadtion' throughout
   * Use logging for verbose output - just remove the prefixes from the format?
+  * Have just one argument for logging, and allow additional levels like TRACE.
   * symbolsAreChars: simplify output further?  Simplify input?
   * Better input error handling
     Its own exception type, with more helpful context and suggestions?
 * Ease of use
   * Allow interactive prompting for initial if it's not provided (or any other missing parameters?)
-  * Assume `.yml` extension for input files
+  * Assume `.yml` extension for input files - so "grids solve Sudoku" is a complete command line.
 
 ## Concepts
 

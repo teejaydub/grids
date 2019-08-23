@@ -39,11 +39,12 @@ class RegionPermutesSymbols(Constraint):
       logging.debug("discarding empty region")
       return []
 
-    if len(self.symbols) == 1:  # Only one symbols is possible
+    if len(self.symbols) == 1:  # Only one symbol is possible
       # We can't get here unless there's also exactly one cell in the region.
       # Set that in the solution, and then we're done with this constraint.
-      logging.debug("Placing %s at %s", self.symbols[0], self.region.cells[0])
-      puzzle.solution.setCell(self.region.cells[0], self.symbols)
+      if puzzle.solution.at(self.region.cells[0]) != self.symbols:
+        logging.debug("Placing %s at %s", self.symbols[0], self.region.cells[0])
+        puzzle.solution.setCell(self.region.cells[0], self.symbols)
       return []
 
     result = self.partition(puzzle)
@@ -52,16 +53,16 @@ class RegionPermutesSymbols(Constraint):
     # If nothing produced new constraints, keep this one.
     return [self]
 
-# Steps in solving the puzzle
+# Solving techniques:
 
   def expandStars(self, puzzle):
     """ For every cell in the region that has a '*' in its Placements,
         replace the '*' with a list of all the symbols.
     """
-    for coords in self.region:
-      cell = puzzle.solution.at(coords)
+    for location in self.region:
+      cell = puzzle.solution.at(location)
       if cell == '*' or cell == ['*']:
-        puzzle.solution.setCell(coords, self.symbols)
+        puzzle.solution.setCell(location, self.symbols)
 
   def partition(self, puzzle):
     """ For every group of n cells that contain the same n symbols and no others,
@@ -74,14 +75,14 @@ class RegionPermutesSymbols(Constraint):
     """
     # First, index the contents.
     index = {}  # maps a set of symbols to the coordinates at which they appear.
-    for coords in self.region:
-      subset = puzzle.solution.at(coords)
+    for location in self.region:
+      subset = puzzle.solution.at(location)
       if len(subset) < len(self.symbols):
         symbols = '|'.join(subset)
         if symbols in index:
-          index[symbols].append(coords)
+          index[symbols].append(location)
         else:
-          index[symbols] = [coords]
+          index[symbols] = [location]
 
     for symbols, coordList in index.items():
       subset = symbols.split('|')
@@ -96,8 +97,8 @@ class RegionPermutesSymbols(Constraint):
           RegionPermutesSymbols(remainderRegion, remainderSymbols)]
 
         # We cank also remove all the subset symbols from the remainder region.
-        for coords in remainderRegion:
-          puzzle.solution.eliminateAt(coords, subset)
+        for location in remainderRegion:
+          puzzle.solution.eliminateAt(location, subset)
 
         return result
 
