@@ -59,9 +59,7 @@ def test(verbose):
 
   result = runner.invoke(cli, ['solve', 'su-test-1.yml'])
   assert result.exit_code == 0
-  assert 'Solved' in result.output
-  assert """
-Solved:
+  assert """Solved:
 [ 9 5 3 4 1 2 6 7 8
   4 1 8 5 6 7 2 3 9
   7 2 6 3 9 8 1 4 5
@@ -75,9 +73,7 @@ Solved:
 
   result = runner.invoke(cli, ['solve', 'su-test-2.yml'])
   assert result.exit_code == 0
-  assert 'Solved' in result.output
-  assert """
-Solved:
+  assert """Solved:
 [ 1 4 2 6 9 3 5 8 7
   9 6 8 1 7 5 2 4 3
   7 3 5 4 2 8 6 1 9

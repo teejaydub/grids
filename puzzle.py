@@ -118,7 +118,7 @@ class Puzzle:
 
   def constraintNames(self):
     """ Returns a printable list of the current constraint set. """
-    return '[' + ', '.join([str(c) for c in self.constraints]) + ']'
+    return '{\n  ' + '\n  '.join([str(c) for c in self.constraints]) + '\n}'
 
   def formatSize(self, size):
     return '(' + functools.reduce(lambda a, b: a + 'x' + b, map(str, self.size)) + ")"
@@ -183,7 +183,7 @@ class Puzzle:
     """
     # Reduce the constraints as far as possible analytically.
     while self.reduceConstraints():
-      logging.debug("Reduced: %s", self.constraintNames())
+      logging.debug("\nReduced: %s", self)
     return self.isSolved()
 
   def isSolved(self):

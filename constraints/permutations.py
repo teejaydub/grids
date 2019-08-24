@@ -25,7 +25,7 @@ class RegionPermutesSymbols(Constraint):
     """
     self.region = Region(region)
     self.symbols = symbols
-    logging.debug("RegionPermutesSymbols(%s, %s)", region, symbols)
+    # logging.debug("RegionPermutesSymbols(%s, %s)", region, symbols)
     if len(symbols) != len(self.region.cells):
       raise Exception("Can't permute " + str(len(symbols)) + " symbols into " + str(len(self.region.cells)) + " cells")
 
@@ -33,33 +33,36 @@ class RegionPermutesSymbols(Constraint):
     return super().__str__() + ': ' + str(self.symbols) + ' in ' + str(self.region)
 
   def apply(self, puzzle):
-    self.expandStars(puzzle)
-
-    if len(self.symbols) == 0:  # Nothing to do, so finish this constraint
-      logging.debug("discarding empty region")
-      return []
-
-    if len(self.symbols) == 1:  # Only one symbol is possible
-      # We can't get here unless there's also exactly one cell in the region.
-      # Set that in the solution, and then we're done with this constraint.
-      if puzzle.solution.at(self.region.cells[0]) != self.symbols:
-        logging.debug("Placing %s at %s", self.symbols[0], self.region.cells[0])
-        puzzle.solution.setCell(self.region.cells[0], self.symbols)
-      return []
-
-    result = self.partition(puzzle)
-    if result is not None: return result
-
-    result = self.solo(puzzle)
-    if result is not None: return result
-
-    result = self.borrow(puzzle)
-    if result is not None: return result
+    # Apply all the techniques in order of difficulty, stopping when one has results.
+    for technique in [
+      self.empty, self.solo, self.expandStars,
+      self.partition, self.misfit,
+      self.borrow
+    ]:
+      result = technique(puzzle)
+      if result is not None:
+        return result
 
     # If nothing produced new constraints, keep this one.
     return [self]
 
-# Solving techniques:
+# Solving techniques, from trivial to easy to harder:
+
+  def empty(self, puzzle):
+    """ Catch any empty constraints and discard them. """
+    if len(self.symbols) == 0:
+      logging.debug("discarding empty region")
+      return []
+
+  def solo(self, puzzle):
+    """ If there's only one symbol, it must be the symbol for a single cell.
+        Set that in the solution, and then we're done with this constraint.
+    """
+    if len(self.symbols) == 1:  # Only one symbol is possible
+      if puzzle.solution.at(self.region.cells[0]) != self.symbols:  # don't log if it's redundant
+        logging.debug("Solo: Placing %s at %s", self.symbols[0], self.region.cells[0])
+        puzzle.solution.setCell(self.region.cells[0], self.symbols)
+      return []
 
   def expandStars(self, puzzle):
     """ For every cell in the region that has a '*' in its Placements,
@@ -100,12 +103,12 @@ class RegionPermutesSymbols(Constraint):
           subset, coordList, remainder.symbols, remainder.region)
         result = [RegionPermutesSymbols(coordList, subset), remainder]
 
-        # We cank also remove all the subset symbols from the remainder region.
+        # We can also remove all the subset symbols from the remainder region.
         puzzle.solution.eliminateThroughout(remainder.region, subset)
 
         return result
 
-  def solo(self, puzzle):
+  def misfit(self, puzzle):
     """ Look for a symbol that only occurs in one place within the region.
         Everything else can be eliminated from that cell, 
         and we can replace this constraint with a new one excluding that cell and symbol.
@@ -118,14 +121,14 @@ class RegionPermutesSymbols(Constraint):
           index[s].append(cell)
         else:
           index[s] = [cell]
-    logging.debug("solo: index: %s", index)
+    # logging.debug("misfit: index: %s", index)
 
-    # Now, find the first solo symbol.
+    # Now, find the first misfit symbol.
     for s, locations in index.items():
       if len(locations) == 1:
         puzzle.solution.setCell(locations[0], s)
         remainder = self.remainder(locations, [s])
-        logging.debug("Solo: %s must be %s, since it can't occur elsewhere in %s",
+        logging.debug("Misfit: %s must be %s, since it can't occur elsewhere in %s",
           locations[0], s, self.region)
         return [remainder]
 
