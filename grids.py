@@ -18,22 +18,23 @@ def cli():
 def solve(input, verbose, debug):
   """ Solve a puzzle specified by one or more INPUT constraints files. """
   if debug:
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(format='%(message)s', level=logging.DEBUG)
   elif verbose:
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(format='%(message)s', level=logging.INFO)
 
   p = puzzle.Puzzle()
   for i in input:
     p.addConstraints(i)
-  if verbose or debug:
-    click.echo("Puzzle:")
-    click.echo(p)
-    click.echo("\nSolving...")
+  logging.info("Puzzle:")
+  logging.info(p)
+  logging.info("\nSolving...")
   if p.solve():
-    click.echo("\nSolved:")
+    logging.info("")  # separator
+    click.echo("Solved:")
     click.echo(str(p.solution))
   else:
-    click.echo("\nCan't solve.")
+    logging.info("")  # separator
+    click.echo("Can't solve.")
     if p.solution:
       click.echo("Best solution:")
       click.echo(p.solution)

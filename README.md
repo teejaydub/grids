@@ -17,11 +17,10 @@ Next to-dos:
 
 * Better solving
   * Add more solving techniques and test with harder Sudokus
-    * Permutation techniques that operate between constraints
-      * solo technique
-    * More status on solving: number of reduction steps, time
-    * Associate difficulty levels with techniques, so we can report how hard it was to solve
     * Tree traversal, starting with 2-symbol cells
+    * More status on solving: number of reduction steps, time
+    * Permutation techniques that operate between constraints
+    * Associate difficulty levels with techniques, so we can report how hard it was to solve
   * Add Sixy Sudoku puzzle type - should need no further code
   * Add constraint types for KenKen, KaKuRo
 * Puzzle creation, with target difficulty
