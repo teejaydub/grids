@@ -13,14 +13,13 @@ def cli():
 
 @cli.command()
 @click.argument('input', type=click.File('rb'), nargs=-1)
-@click.option('-v/-q', '--verbose/--quiet', 'verbose', help="More output")
-@click.option('-d', '--debug', 'debug', is_flag=True, help="Debugging output")
-def solve(input, verbose, debug):
+@click.option('-q', '--quiet', 'loglevel', flag_value=logging.ERROR, help="Minimal output")
+@click.option('--normal-output', 'loglevel', flag_value=logging.WARNING, help="Normal output", default=True)
+@click.option('-v', '--verbose', 'loglevel', flag_value=logging.INFO, help="More output")
+@click.option('-d', '--debug', 'loglevel', flag_value=logging.DEBUG, help="Debugging output")
+def solve(input, loglevel):
   """ Solve a puzzle specified by one or more INPUT constraints files. """
-  if debug:
-    logging.basicConfig(format='%(message)s', level=logging.DEBUG)
-  elif verbose:
-    logging.basicConfig(format='%(message)s', level=logging.INFO)
+  logging.basicConfig(format='%(message)s', level=loglevel)
 
   p = puzzle.Puzzle()
   for i in input:

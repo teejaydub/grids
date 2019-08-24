@@ -25,8 +25,6 @@ Next to-dos:
   * Add constraint types for KenKen, KaKuRo
 * Puzzle creation, with target difficulty
 * Code improvements
-  * Use logging for verbose output - just remove the prefixes from the format?
-  * Have just one argument for logging, and allow additional levels like TRACE.
   * symbolsAreChars: simplify output further?  Simplify input?
   * Better input error handling
     Its own exception type, with more helpful context and suggestions?
