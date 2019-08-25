@@ -85,5 +85,19 @@ def test(verbose):
   3 8 1 5 4 9 7 2 6 ]
 """ in result.output
 
+  result = runner.invoke(cli, ['solve', 'su-test-3.yml'])
+  assert result.exit_code == 0
+  assert """Solved:
+[ 2 5 4 1 6 9 3 7 8
+  9 7 3 4 2 8 5 6 1
+  6 8 1 7 3 5 4 2 9
+  8 1 2 6 5 4 9 3 7
+  4 3 9 8 1 7 2 5 6
+  7 6 5 2 9 3 1 8 4
+  3 4 7 9 8 2 6 1 5
+  5 9 6 3 7 1 8 4 2
+  1 2 8 5 4 6 7 9 3 ]
+""" in result.output
+
 if __name__ == "__main__":
   cli()
