@@ -16,14 +16,12 @@ Next to-dos:
 
 * Better solving
   * Add more solving techniques and test with harder Sudokus
-    * #3 should be solvable with human techniques
-      * new test for #3
-      * check for the presence of technique names in debug output
-      * Pencilmark-friendly output: huge ASCII, or HTML?
+    * More status on solving: number of reduction steps, technique names, difficulty level, time
+      * Associate difficulty levels with techniques
+    * Testing: check for the presence of technique names in debug output
+    * Pencilmark-friendly output: huge ASCII, or HTML?
     * Other Permutation techniques that operate between constraints
     * Tree traversal, starting with 2-symbol cells
-    * More status on solving: number of reduction steps, time
-    * Associate difficulty levels with techniques, so we can report how hard it was to solve
   * Add Sixy Sudoku puzzle type - should need no further code
   * Add constraint types for KenKen, KaKuRo
 * Puzzle creation, with target difficulty

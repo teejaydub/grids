@@ -1,8 +1,8 @@
-run:
-	python grids.py
-
 test:
 	python grids.py test
+
+run:
+	python grids.py
 
 install:
 	pip install --editable .
