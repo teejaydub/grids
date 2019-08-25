@@ -17,7 +17,6 @@ Next to-dos:
 * Better solving
   * Add more solving techniques and test with harder Sudokus
     * #3 should be solvable with human techniques
-      * existing tests working
       * new test for #3
       * check for the presence of technique names in debug output
       * Pencilmark-friendly output: huge ASCII, or HTML?

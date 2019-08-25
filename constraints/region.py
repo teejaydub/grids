@@ -37,15 +37,20 @@ class Region():
         '[(0, 0)]'
     """
     if isinstance(region, str):
-      # Chess-style string range: find the start and end as coordinates.
-      (first, last) = region.split('-')
-      (startRow, startCol) = parseChess(first)
-      (endRow, endCol) = parseChess(last)
+      if '-' in region:
+        # Chess-style string range: find the start and end as coordinates.
+        (first, last) = region.split('-')
 
-      self.cells = []
-      for r in range(startRow, endRow + 1):
-        for c in range(startCol, endCol + 1):
-          self.cells += [(r, c)]
+        (startRow, startCol) = parseChess(first)
+        (endRow, endCol) = parseChess(last)
+
+        self.cells = []
+        for r in range(startRow, endRow + 1):
+          for c in range(startCol, endCol + 1):
+            self.cells += [(r, c)]
+      else:
+        # Chess-style single square.
+        self.cells = [parseChess(region)]
     elif isinstance(region, (list, tuple)):
       if len(region) > 0 and isinstance(region[0], int):
         # Looks like a single set of coordinates.
@@ -99,7 +104,7 @@ class Region():
 
   def intersect(self, other):
     """ Return a Region that contains all cells that are in both self and other. 
-        >>> Region('a1-b2').intersect(Region('a1-a9'))
+        >>> print(Region('a1-b2').intersect(Region('a1-a9')))
         [(0, 0), (0, 1)]
     """
     return Region([cell for cell in other if cell in self.cells])
