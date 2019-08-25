@@ -27,12 +27,13 @@ def solve(input, loglevel):
   logging.info("Puzzle:")
   logging.info(p)
   logging.info("\nSolving...")
-  if p.solve():
-    logging.info("")  # separator
+  result = p.solve();
+  click.echo("Took %s passes." % p.stats['passes'])
+  logging.info("")  # separator
+  if result:
     click.echo("Solved:")
     click.echo(str(p.solution))
   else:
-    logging.info("")  # separator
     click.echo("Can't solve.")
     if p.solution:
       click.echo("Best solution:")

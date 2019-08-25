@@ -19,7 +19,7 @@ Next to-dos:
     * More status on solving: number of reduction steps, technique names, difficulty level, time
       * Associate difficulty levels with techniques
     * Testing: check for the presence of technique names in debug output
-    * Pencilmark-friendly output: huge ASCII, or HTML?
+    * Pencilmark-friendly output when can't solve: huge ASCII, or HTML?
     * Other Permutation techniques that operate between constraints
     * Tree traversal, starting with 2-symbol cells
   * Add Sixy Sudoku puzzle type - should need no further code
@@ -29,6 +29,7 @@ Next to-dos:
   * symbolsAreChars: simplify output further?  Simplify input?
   * Better input error handling
     Its own exception type, with more helpful context and suggestions?
+      Look at Click's user input exceptions
 * Ease of use
   * Allow interactive prompting for initial if it's not provided (or any other missing parameters?)
   * Assume `.yml` extension for input files - so "grids solve Sudoku" is a complete command line.

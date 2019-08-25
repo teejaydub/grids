@@ -21,6 +21,7 @@ class Puzzle:
     self.symbolsAreChars = True  # True if all symbols are single-character strings  (to do: default to None and set with symbols)
     self.initial = None  # a Placement
     self.solution = None  # a Placement, set when a solution is found
+    self.stats = None
 
   def addConstraints(self, constraints):
     """ Add constraints from various sources, distinguished by type.
@@ -174,6 +175,7 @@ class Puzzle:
         result = True
       newConstraints.extend(changes)
     self.constraints = newConstraints
+    self.stats['passes'] += 1
     return result
 
   def solve(self):
@@ -181,6 +183,8 @@ class Puzzle:
         If one can be found, return True and put its position in self.solution.
         If not, return False.
     """
+    # Collect some stats as we go.
+    self.stats = {'passes': 0}
     # Reduce the constraints as far as possible analytically.
     while self.reduceConstraints():
       logging.debug("\nReduced: %s", self)
