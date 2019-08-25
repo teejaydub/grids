@@ -28,7 +28,13 @@ def solve(input, loglevel):
   logging.info(p)
   logging.info("\nSolving...")
   result = p.solve();
-  click.echo("Took %s passes." % p.stats['passes'])
+
+  # Report stats but not using logging - so it's available to regression tests.
+  if loglevel <= logging.INFO:
+    click.echo("Took %s passes." % p.stats['passes'])
+    techniques = sorted(p.stats['techniques'].items(), key=lambda kv: -kv[1])
+    click.echo("Used these techniques: %s" % ', '.join([t[0] + ' (' + str(t[1]) + 'x)' for t in techniques]))
+
   logging.info("")  # separator
   if result:
     click.echo("Solved:")
@@ -58,7 +64,7 @@ def test(verbose):
   from click.testing import CliRunner
   runner = CliRunner()
 
-  result = runner.invoke(cli, ['solve', 'su-test-1.yml'])
+  result = runner.invoke(cli, ['solve', 'su-test-1.yml', '-v'])
   assert result.exit_code == 0
   assert """Solved:
 [ 9 5 3 4 1 2 6 7 8
@@ -71,8 +77,10 @@ def test(verbose):
   2 6 9 7 5 3 8 1 4
   8 3 7 2 4 1 9 5 6 ]
 """ in result.output
+  assert "partition" in result.output
+  assert "solo" in result.output
 
-  result = runner.invoke(cli, ['solve', 'su-test-2.yml'])
+  result = runner.invoke(cli, ['solve', 'su-test-2.yml', '-v'])
   assert result.exit_code == 0
   assert """Solved:
 [ 1 4 2 6 9 3 5 8 7
@@ -85,8 +93,10 @@ def test(verbose):
   6 5 7 8 3 2 4 9 1
   3 8 1 5 4 9 7 2 6 ]
 """ in result.output
+  assert "partition" in result.output
+  assert "solo" in result.output
 
-  result = runner.invoke(cli, ['solve', 'su-test-3.yml'])
+  result = runner.invoke(cli, ['solve', 'su-test-3.yml', '-v'])
   assert result.exit_code == 0
   assert """Solved:
 [ 2 5 4 1 6 9 3 7 8
@@ -99,6 +109,8 @@ def test(verbose):
   5 9 6 3 7 1 8 4 2
   1 2 8 5 4 6 7 9 3 ]
 """ in result.output
+  assert "intersection" in result.output
+  assert "misfit" in result.output
 
 if __name__ == "__main__":
   cli()

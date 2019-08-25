@@ -94,10 +94,7 @@ class Placements():
     index = {}
     for location in region:
       for s in self.at(location):
-        if s in index:
-          index[s].append(location)
-        else:
-          index[s] = [location]
+        index.setdefault(s, []).append(location)
     return index
 
   def setCell(self, location, contents):

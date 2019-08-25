@@ -178,13 +178,18 @@ class Puzzle:
     self.stats['passes'] += 1
     return result
 
+  def logTechnique(self, name):
+    """ Notes down the use of a named technique while solving. """
+    t = self.stats['techniques']
+    t[name] = t.setdefault(name, 0) + 1
+
   def solve(self):
     """ Attempt to find a solution to the initial condition and constraints.
         If one can be found, return True and put its position in self.solution.
         If not, return False.
     """
     # Collect some stats as we go.
-    self.stats = {'passes': 0}
+    self.stats = {'passes': 0, 'techniques': {} }
     # Reduce the constraints as far as possible analytically.
     while self.reduceConstraints():
       logging.debug("\nReduced: %s", self)
