@@ -27,17 +27,22 @@ class RegionPermutesSymbols(Constraint):
     self.symbols = symbols
     # logging.debug("RegionPermutesSymbols(%s, %s)", region, symbols)
     if len(symbols) != len(self.region.cells):
-      raise Exception("Can't permute " + str(len(symbols)) + " symbols into " + str(len(self.region.cells)) + " cells")
+      raise Exception("Can't permute " + str(symbols) + " over " + str(self.region.cells))
 
   def __str__(self):
     return super().__str__() + ': ' + str(self.symbols) + ' in ' + str(self.region)
+
+  def copy(self):
+    """ Make a distinct duplicate. """
+    return RegionPermutesSymbols(self.region, self.symbols)
 
   def apply(self, puzzle):
     # Apply all the techniques in order of difficulty, stopping when one has results.
     for technique in [
       self.empty, self.solo, self.expandStars,
       self.partition, self.misfit,
-      self.borrow
+      self.borrow,
+      self.intersection
     ]:
       result = technique(puzzle)
       if result is not None:
@@ -114,13 +119,7 @@ class RegionPermutesSymbols(Constraint):
         and we can replace this constraint with a new one excluding that cell and symbol.
     """
     # First, count how many times each symbol appears in our region.
-    index = {}
-    for cell in self.region:
-      for s in puzzle.solution.at(cell):
-        if s in index:
-          index[s].append(cell)
-        else:
-          index[s] = [cell]
+    index = puzzle.solution.indexSymbolsIn(self.region)
     # logging.debug("misfit: index: %s", index)
 
     # Now, find the first misfit symbol.
@@ -140,13 +139,33 @@ class RegionPermutesSymbols(Constraint):
     """
     for constraint in puzzle.constraints:
       if isinstance(constraint, RegionPermutesSymbols):
-        if constraint.region.isProperSubsetOf(self.region):
+        if self.region.hasProperSubset(constraint.region):
           remainder = self.remainderConstraint(constraint)
           logging.debug("Borrowing %s from %s, leaving %s in %s", 
             constraint.symbols, constraint.region, remainder.symbols, remainder.region)
           puzzle.solution.eliminateThroughout(remainder.region, constraint.symbols)
           return [remainder]
 
+  def intersection(self, puzzle):
+    """ Look for another permutation constraint whose region intersects with this one.
+        If there are any symbols that only occur in the other constraint's region within the intersection,
+        that means they have to occur in that intersection,
+        so they can be removed from the remainder of the cells in this region.
+        Make a new constraint, but just to document that something's chnaged.
+    """
+    for constraint in puzzle.constraints:
+      if isinstance(constraint, RegionPermutesSymbols) and constraint is not self:
+        intersection = self.region.intersect(constraint.region)
+        if not intersection.isEmpty():
+          index = puzzle.solution.indexSymbolsIn(constraint.region)
+          # logging.debug("Intersection index: %s", index)
+          for s, locations in index.items():
+            if intersection.hasSubset(locations):
+              remainder = subtractLists(self.region, intersection)
+              logging.debug("Intersection: %s occurs only in %s, so remove it from %s",
+                s, intersection, remainder)
+              puzzle.solution.eliminateThroughout(remainder, [s])
+              return [self.copy()]
 
   # Utility functions:
 

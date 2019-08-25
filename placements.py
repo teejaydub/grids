@@ -87,6 +87,19 @@ class Placements():
     """
     return self.cells[location[0]][location[1]]
 
+  def indexSymbolsIn(self, region):
+    """ Return a reverse index, that maps a single symbol to a list of locations where it occurs.
+        Limits the index to the locations within the given region.
+    """
+    index = {}
+    for location in region:
+      for s in self.at(location):
+        if s in index:
+          index[s].append(location)
+        else:
+          index[s] = [location]
+    return index
+
   def setCell(self, location, contents):
     if isinstance(contents, str):
       # If I set it to a single symbol, make it into a list.

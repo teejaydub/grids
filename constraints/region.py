@@ -55,6 +55,8 @@ class Region():
       else:
         # List of coordinate tuples.
         self.cells = region
+    elif isinstance(region, Region):
+      self.cells = region.cells
     else:
       raise Exception("Don't know how to create a Region from " + str(region))
 
@@ -66,14 +68,38 @@ class Region():
     for cell in self.cells:
       yield cell
 
-  def isProperSubsetOf(self, other):
-    """ Returns True iff other is a Region whose cells are all within ours,
-        and it's also smaller.
+  def isEmpty(self):
+    return len(self.cells) == 0
+
+  def hasSubset(self, other):
+    """ Return True if all cells in the other Region (or list of locations)
+        are contained within this Region.
+
+        >>> Region('a1-b2').hasSubset(Region('a1'))
+        True
+        >>> Region('a1-b2').hasSubset(Region('b3'))
+        False
     """
-    if isinstance(other, Region):
-      if len(other.cells) < len(self.cells):
-        for cell in other.cells:
-          if not cell in self.cells:
-            return False
-        return True
-    return False
+    for cell in other:
+      if not cell in self.cells:
+        return False
+    return True
+
+  def hasProperSubset(self, other):
+    """ Return True if other is a subset of self, and it's also smaller.
+
+        >>> Region('a1-b2').hasProperSubset(Region('a1-b2'))
+        False
+        >>> Region('a1-b2').hasProperSubset(Region('a1-b3'))
+        False
+        >>> Region('a1-b2').hasProperSubset(Region('a1-b1'))
+        True
+    """
+    return len(other.cells) < len(self.cells) and self.hasSubset(other)
+
+  def intersect(self, other):
+    """ Return a Region that contains all cells that are in both self and other. 
+        >>> Region('a1-b2').intersect(Region('a1-a9'))
+        [(0, 0), (0, 1)]
+    """
+    return Region([cell for cell in other if cell in self.cells])
