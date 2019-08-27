@@ -152,7 +152,7 @@ class RegionPermutesSymbols(Constraint):
     for constraint in puzzle.constraints:
       if isinstance(constraint, RegionPermutesSymbols) and constraint is not self:
         intersection = self.region.intersect(constraint.region)
-        if not intersection.isEmpty():
+        if not intersection.isEmpty() and intersection.size() < self.region.size():
           index = puzzle.solution.indexSymbolsIn(constraint.region)
           # logging.debug("Intersection index: %s", index)
           for s, locations in index.items():

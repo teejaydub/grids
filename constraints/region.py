@@ -69,6 +69,9 @@ class Region():
       result = '[' + result + ']'
     return result
 
+  def size(self):
+    return len(self.cells)
+
   def __iter__(self):
     """ Yield the coordinate tuples in the Region. """
     for cell in self.cells:
