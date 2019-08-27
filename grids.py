@@ -49,8 +49,7 @@ def solve(input, loglevel, singleStep):
     click.echo(p)
 
 def showStep(name):
-  if not click.pause():
-    raise click.Abort()
+  click.confirm("Continue?", default=True, abort=True)
 
 @cli.command()
 @click.option('-v/-q', '--verbose/--quiet', 'verbose')
@@ -60,8 +59,9 @@ def test(verbose):
   # Using docstrings:
   import doctest
   import placements
-  from constraints import region, permutations, numbers
+  from constraints import chess, region, permutations, numbers
   doctest.testmod(verbose=verbose)
+  doctest.testmod(chess, verbose=verbose)
   doctest.testmod(numbers, verbose=verbose)
   doctest.testmod(permutations, verbose=verbose)
   doctest.testmod(placements, verbose=verbose)

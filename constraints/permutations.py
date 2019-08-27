@@ -1,5 +1,6 @@
 import logging
 
+from . import chess
 from .constraint import Constraint
 from .region import Region
 
@@ -68,7 +69,7 @@ class RegionPermutesSymbols(Constraint):
     """
     if len(self.symbols) == 1:  # Only one symbol is possible
       if puzzle.solution.at(self.region.cells[0]) != self.symbols:  # don't log if it's redundant
-        logging.debug("Solo: Placing %s at %s", self.symbols[0], self.region.cells[0])
+        logging.debug("Solo: Placing %s at %s", self.symbols[0], chess.location(self.region.cells[0]))
         puzzle.logTechnique('solo')
         puzzle.solution.setCell(self.region.cells[0], self.symbols)
       return []
@@ -97,7 +98,7 @@ class RegionPermutesSymbols(Constraint):
         # So, the given coordList can be partitioned off from the rest of the region.
         remainder = self.remainder(coordList, subset)
         logging.debug("Partitioning out %s in %s, leaving %s in %s", 
-          subset, coordList, remainder.symbols, remainder.region)
+          self.showSymbols(subset), chess.locations(coordList), self.showSymbols(remainder.symbols), remainder.region)
         puzzle.logTechnique('partition')
         result = [RegionPermutesSymbols(coordList, subset), remainder]
 
@@ -121,7 +122,7 @@ class RegionPermutesSymbols(Constraint):
         puzzle.solution.setCell(locations[0], s)
         remainder = self.remainder(locations, [s])
         logging.debug("Misfit: %s must be %s, since it can't occur elsewhere in %s",
-          locations[0], s, self.region)
+          chess.location(locations[0]), self.showSymbols(s), self.region)
         puzzle.logTechnique('misfit')
         return [remainder]
 
@@ -136,7 +137,7 @@ class RegionPermutesSymbols(Constraint):
         if self.region.hasProperSubset(constraint.region):
           remainder = self.remainderConstraint(constraint)
           logging.debug("Borrowing %s from %s, leaving %s in %s", 
-            constraint.symbols, constraint.region, remainder.symbols, remainder.region)
+            self.showSymbols(constraint.symbols), constraint.region, self.showSymbols(remainder.symbols), remainder.region)
           puzzle.logTechnique('borrow')
           puzzle.solution.eliminateThroughout(remainder.region, constraint.symbols)
           return [remainder]
@@ -158,7 +159,7 @@ class RegionPermutesSymbols(Constraint):
             if intersection.hasSubset(locations):
               remainder = subtractLists(self.region, intersection)
               logging.debug("Intersection: %s occurs only in %s, so remove it from %s",
-                s, intersection, remainder)
+                s, intersection, chess.locations(remainder))
               puzzle.logTechnique('intersection')
               puzzle.solution.eliminateThroughout(remainder, [s])
               return [self.copy()]
