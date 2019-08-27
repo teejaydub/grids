@@ -15,15 +15,19 @@ Solves easy to hard Sudoku with 5 techniques.
 Next to-dos:
 
 * Better solving
-  * Add more solving techniques and test with harder Sudokus
-    * More status on solving: number of reduction steps, technique names, difficulty level, time
-      * Associate difficulty levels with techniques
+  * Add constraint types for KenKen
+    * Change Region to output using chess notation?  More legible; better for round-tripping later during create
+    * Refine input so you can say "Math: a1+a2+a3 = 6"
+  * Add more solving techniques and test with "extreme" Sudokus
+    * Associate difficulty levels with techniques
+      * Exhaust easier techniques before trying harder ones?
+      * Report highest difficulty level reached
     * Testing: check for the presence of technique names in debug output
     * Pencilmark-friendly output when can't solve: huge ASCII, or HTML?
     * Other Permutation techniques that operate between constraints
     * Tree traversal, starting with 2-symbol cells
-  * Add Sixy Sudoku puzzle type - should need no further code
-  * Add constraint types for KenKen, KaKuRo
+  * Add constraint file for Sixy Sudoku
+  * Add constraint file for KaKuRo
 * Puzzle creation, with target difficulty
 * Code improvements
   * symbolsAreChars: simplify output further?  Simplify input?
@@ -31,7 +35,9 @@ Next to-dos:
     Its own exception type, with more helpful context and suggestions?
       Look at Click's user input exceptions
 * Ease of use
+  * Hint mode: show next modification to the solution and the constraint it comes from
   * Allow interactive prompting for initial if it's not provided (or any other missing parameters?)
+    * Then save that to an auto-named file for convenient re-editing
   * Assume `.yml` extension for input files - so "grids solve Sudoku" is a complete command line.
 
 ## Concepts
@@ -243,7 +249,7 @@ The same, but with a subset of the puzzle's full symbol set.
 This class is where all the solving techniques are implemented for `Region`
 constraints; other constraints reduce to this one.
 
-### MathOpConstraint
+### MathOp
 
 Constructor arguments:
 

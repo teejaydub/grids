@@ -1,2 +1,2 @@
-from .numbers import SymbolsNumericDigits, SymbolsNumericByDiameter
+from .numbers import SymbolsNumericDigits, SymbolsNumericByDiameter, SumIs
 from .permutations import RegionsAreCompletePermutation, EachDimensionIsCompletePermutation

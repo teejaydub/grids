@@ -1,0 +1,5 @@
+# KenKen basic constraints
+# All the math constraints are specific to the individual puzzle, as is the size.
+constraints:
+  - SymbolsNumericByDiameter
+  - EachDimensionIsCompletePermutation

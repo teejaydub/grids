@@ -41,9 +41,8 @@ def solve(input, loglevel):
     click.echo(str(p.solution))
   else:
     click.echo("Can't solve.")
-    if p.solution:
-      click.echo("Best solution:")
-      click.echo(p.solution)
+    click.echo("Best solution:")
+    click.echo(p)
 
 @cli.command()
 @click.option('-v/-q', '--verbose/--quiet', 'verbose')
@@ -53,12 +52,13 @@ def test(verbose):
   # Using docstrings:
   import doctest
   import placements
-  from constraints import region, permutations
+  from constraints import region, permutations, numbers
   doctest.testmod(verbose=verbose)
+  doctest.testmod(numbers, verbose=verbose)
+  doctest.testmod(permutations, verbose=verbose)
+  doctest.testmod(placements, verbose=verbose)
   doctest.testmod(puzzle, verbose=verbose)
   doctest.testmod(region, verbose=verbose)
-  doctest.testmod(placements, verbose=verbose)
-  doctest.testmod(permutations, verbose=verbose)
 
   # Test command-line interface and solving:
   from click.testing import CliRunner

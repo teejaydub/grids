@@ -27,7 +27,7 @@ class RegionPermutesSymbols(Constraint):
     self.symbols = symbols
     # logging.debug("RegionPermutesSymbols(%s, %s)", region, symbols)
     if len(symbols) != len(self.region.cells):
-      raise Exception("Can't permute " + str(symbols) + " over " + str(self.region.cells))
+      raise Exception("Can't permute " + str(symbols) + " over " + str(self.region))
 
   def __str__(self):
     return super().__str__() + ': ' + str(self.symbols) + ' in ' + str(self.region)
