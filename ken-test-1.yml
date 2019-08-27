@@ -1,12 +1,5 @@
 - KenKen
-- initial: |
-    *******
-    *******
-    **5****
-    *****5*
-    7******
-    *******
-    *******
+- size: [7, 7]
 
 # Explicitly list region constraints:
 - name: DifferenceIs
@@ -29,6 +22,9 @@
 - Math: c6/c7 = 3
 
 # Even shorter:
+- c3 = 5
+- d6 = 5
+- e1 = 7
 - d3+e3+f3 = 13
 - d7/e7 = 3
 - e2-f2 = 3

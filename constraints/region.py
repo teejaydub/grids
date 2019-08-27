@@ -92,6 +92,15 @@ class Region():
   def isEmpty(self):
     return len(self.cells) == 0
 
+  def contains(self, location):
+    """ Return True if the given coordinate pair location is within this Region.
+        >>> Region('a1-b2').contains((0, 0))
+        True
+        >>> Region('a1-b2').contains((1, 2))
+        False
+    """
+    return location in self.cells
+
   def hasSubset(self, other):
     """ Return True if all cells in the other Region (or list of locations)
         are contained within this Region.
@@ -137,6 +146,9 @@ class RegionConstraint(Constraint):
   def __init__(self, region):
     super().__init__()
     self.region = Region(region)
+
+  def contains(self, location):
+    return self.region.contains(location)
 
   def techniques(self):
     return super().techniques() + [self.empty]

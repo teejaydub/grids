@@ -3,3 +3,4 @@
 constraints:
   - SymbolsNumericByDiameter
   - EachDimensionIsCompletePermutation
+  - AllCellsMustHaveMathOp

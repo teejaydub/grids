@@ -1,3 +1,4 @@
+import copy
 import functools
 import io
 import logging
@@ -33,7 +34,7 @@ class Puzzle:
       >>> p.addConstraints(['Unknown'])
       Traceback (most recent call last):
       ...
-      Exception: Can't load constraint Unknown: {}
+      Exception: Can't load constraint Unknown: {} - KeyError
     """
     if constraints is None:
       return
@@ -82,8 +83,8 @@ class Puzzle:
         del new_args['name']  # so it doesn't get passed as an argument to the constraint constructor
       constraint = constraintClass(**new_args)
       self.constraints.append(constraint)
-    except:
-      raise Exception("Can't load constraint " + c + ': ' + str(new_args))
+    except Exception as e:
+      raise Exception("Can't load constraint " + c + ': ' + str(new_args) + " - " + e.__class__.__name__)
 
   def tryLoad(self, filename):
     """ If filename exists, load constraints from it and return True.
@@ -113,7 +114,9 @@ class Puzzle:
         3 4 ]
     """
     result = ''
-    if self.initial:
+    if self.solution:
+      result = str(self.solution)
+    elif self.initial:
       result = str(self.initial)
     elif self.size:
       result = self.formatSize(self.size)
@@ -164,7 +167,7 @@ class Puzzle:
     """
     if initial:
       self.initial = Placements(initial)
-      self.solution = self.initial
+      self.solution = Placements(initial)
       self.setSize(self.initial.size())
       self.expandStars()
 
@@ -187,7 +190,8 @@ class Puzzle:
     # This is the simplest implementation, but it can't tell when anything changes.
     # self.constraints = [c.apply(self) for c in self.constraints]
     constraintsChanged = False
-    self.solution.changed = False
+    if self.solution:
+      self.solution.changed = False
 
     self.expandStars()
     newConstraints = []
@@ -195,11 +199,12 @@ class Puzzle:
       changes = c.apply(self)
       if changes != [c]:
         constraintsChanged = True
-      newConstraints.extend(changes)
+      if changes:
+        newConstraints.extend(changes)
     self.constraints = newConstraints
     
     self.stats['passes'] += 1
-    return constraintsChanged or self.solution.changed
+    return constraintsChanged or self.solution and self.solution.changed
 
   def logTechnique(self, name):
     """ Notes down the use of a named technique while solving. """

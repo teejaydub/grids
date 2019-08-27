@@ -18,11 +18,13 @@ Next to-dos:
   * Add constraint types for KenKen
     * Apply constraints
       * Add a constraint to ensure all solution cells have either a Math constraint or are given.
-        Or just enter them as Math constraints and require all 
+        Or just enter them as Math constraints and require all cells in a KenKen to have a Math constraint
+          And make the initial using that constraint.
       * Prime factorization to eliminate candidates
         But the general case is to enumerate the closure of symbols for each square, limit other square to output, and eliminate when the output isn't in symbol set
         Is that slow, though?
         * Also include permutation uniqueness check for the set?  Or just do that with the solution set?
+      * If a MathOp constraint's region is a subset of a PermuteSymbolsConstraint's region, you can eliminate repetitions like n/2 for +
   * Add more solving techniques and test with "extreme" Sudokus
     * Tree traversal, starting with 2-symbol cells
     * Associate difficulty levels with techniques

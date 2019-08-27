@@ -1,5 +1,7 @@
 import logging
 
+from constraints import chess
+
 def showCell(cell):
   """ Returns a string representing a given cell's contents.
       It could be one symbol, or several potential symbols.
@@ -21,7 +23,9 @@ class Placements():
   changed = False
 
   def __init__(self, initial):
+    # logging.debug("Placements(%s)", initial)
     self.cells = self.parse(initial)
+    # logging.debug("  = \n%s", self)
 
   def parse(self, x):
     """ Returns grid contents matching the input.
@@ -102,6 +106,7 @@ class Placements():
     if isinstance(contents, str):
       # If I set it to a single symbol, make it into a list.
       contents = [contents]
+    logging.debug("setCell: %s = %s", chess.location(location), contents)
     if self.cells[location[0]][location[1]] != contents:
       self.cells[location[0]][location[1]] = contents
       self.changed = True

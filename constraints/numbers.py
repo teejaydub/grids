@@ -53,7 +53,7 @@ class MathOp(RegionConstraint):
 
   def singleValue(self, puzzle):
     """ Technique to set the target value as a symbol if the region contains only one cell. """
-    if puzzle.symbols:
+    if puzzle.symbols and puzzle.solution:
       if self.region.size() == 1:
         assert str(self.target) in puzzle.symbols
         assert self.isCommutative  # otherwise, you shouldn't end up with a single cell
@@ -67,29 +67,30 @@ class MathOp(RegionConstraint):
     """ Technique to remove cells with known values from the region,
         and generate a new constraint that adjusts the target appropriately.
     """
-    for location in self.region:
-      cell = puzzle.solution.at(location)
-      if len(cell) == 1 and cell[0] != '*':
-        value = int(cell[0])
-        if self.isCommutative:
-          # For + and *, we can just apply the inverse operator to our current target to find the new target.
-          new = copy.copy(self)
-          new.target = self.inverse(self.target, value)
-          new.region = self.region.subtract([location])
-          logging.debug("Remove known: since %s and %s = %s, %s %s %s = %s",
-            self, chess.location(location), value, self.target, self.inverseName, value, new.target)
-          puzzle.logTechnique('removeKnown')
-          return [new]
-        else:
-          # For - and / with two cells, there are now two possibilities for the remaining cell.
-          # Make a RegionSymbolsConstraint for that, and eliminate values.
-          assert self.region.size() == 2
-          a = str(self.inverse(self.target, value))
-          b = str(self.operator(value, self.target))
-          logging.debug("Remove known: since %s and %s = %s, %s is %s or %s",
-            self, chess.location(location), value, self.region.subtract([location]), a, b)
-          puzzle.logTechnique('removeKnown')
-          return [RegionSymbolsConstraint(self.region.subtract([location]), [a, b])]
+    if puzzle.solution:
+      for location in self.region:
+        cell = puzzle.solution.at(location)
+        if len(cell) == 1 and cell[0] != '*':
+          value = int(cell[0])
+          if self.isCommutative:
+            # For + and *, we can just apply the inverse operator to our current target to find the new target.
+            new = copy.copy(self)
+            new.target = self.inverse(self.target, value)
+            new.region = self.region.subtract([location])
+            logging.debug("Remove known: since %s and %s = %s, %s %s %s = %s",
+              self, chess.location(location), value, self.target, self.inverseName, value, new.target)
+            puzzle.logTechnique('removeKnown')
+            return [new]
+          else:
+            # For - and / with two cells, there are now two possibilities for the remaining cell.
+            # Make a RegionSymbolsConstraint for that, and eliminate values.
+            assert self.region.size() == 2
+            a = str(self.inverse(self.target, value))
+            b = str(self.operator(value, self.target))
+            logging.debug("Remove known: since %s and %s = %s, %s is %s or %s",
+              self, chess.location(location), value, self.region.subtract([location]), a, b)
+            puzzle.logTechnique('removeKnown')
+            return [RegionSymbolsConstraint(self.region.subtract([location]), [a, b])]
 
 class Math(MathOp):
   """ Convenience for more compact typing in input YAML.
@@ -98,7 +99,10 @@ class Math(MathOp):
   """
   def __init__(self, initializer):
     leftside, rightside = initializer.split('=')
-    operator = re.search('[+-/*x]', leftside).group()
+    try:
+      operator = re.search('[+-/*x]', leftside).group()
+    except:
+      operator = '+'  # todo: more error checking - this is for "d1 = 7" e.g.
     squares = leftside.split(operator)
     super().__init__(squares, None, operator, None, None, int(rightside.strip()))
 
@@ -134,3 +138,34 @@ class QuotientIs(MathOp):
   """ A MathOp for division. """
   def __init__(self, region, target):
     super().__init__(region, lambda x,y: x / y, '/', lambda x,y: x * y, '*', target, isCommutative=False)
+
+class AllCellsMustHaveMathOp(Constraint):
+  """ Require that every cell in the puzzle be included in a MathOp constraint's region.
+      Also creates the initial placement, when the size is known, as an array of '*'.
+  """
+  def apply(self, puzzle):
+    if puzzle.size:
+      # Create the initial placement.
+      if not puzzle.initial:
+        logging.debug("Setting initial state to blank")
+        puzzle.setInitial([puzzle.size[1] * '*' for i in range(puzzle.size[0])])
+      else:
+        logging.debug("About to set initial state, but it's already:\n%s", puzzle.initial)
+
+      # Find out if any squares are uncovered.
+      for row in range(0, puzzle.size[0]):
+        for col in range(0, puzzle.size[1]):
+          if not self.inMathOp(puzzle, (row, col)):
+            raise Exception("The cell " + chess.location((row, col)) + " doesn't have a MathOp constriant.")
+
+      return []  # finished
+    else:
+      return [self]  # wait for size
+
+  def inMathOp(self, puzzle, location):
+    """ Return True iff the puzzle has a MathOp constraint that includes the given location in its Region. """
+    for c in puzzle.constraints:
+      if isinstance(c, MathOp):
+        if not c.contains(location):
+          return True
+    return False
