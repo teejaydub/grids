@@ -166,6 +166,17 @@ class Puzzle:
       self.initial = Placements(initial)
       self.solution = self.initial
       self.setSize(self.initial.size())
+      self.expandStars()
+
+  def expandStars(self):
+    """ For every cell in the solution that contains '*',
+        replace the '*' with a list of all the symbols.
+    """
+    if self.size and self.solution and self.symbols:
+      for location in region.Region(self.size):
+        cell = self.solution.at(location)
+        if cell == '*' or cell == ['*']:
+          self.solution.setCell(location, self.symbols)
 
   def reduceConstraints(self):
     """ Apply all constraints.
@@ -176,6 +187,7 @@ class Puzzle:
     # This is the simplest implementation, but it can't tell when anything changes.
     # self.constraints = [c.apply(self) for c in self.constraints]
     result = False
+    self.expandStars()
     newConstraints = []
     for c in self.constraints:
       changes = c.apply(self)
@@ -202,7 +214,7 @@ class Puzzle:
     self.stats = {'passes': 0, 'techniques': {} }
     # Reduce the constraints as far as possible analytically.
     while self.reduceConstraints():
-      logging.debug("\nReduced: %s", self)
+      logging.debug("\nReduced:\n%s", self)
     return self.isSolved()
 
   def isSolved(self):

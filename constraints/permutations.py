@@ -41,7 +41,7 @@ class RegionPermutesSymbols(Constraint):
     if puzzle.solution and puzzle.symbols:
       # Apply all the techniques in order of difficulty, stopping when one has results.
       for technique in [
-        self.empty, self.solo, self.expandStars,
+        self.empty, self.solo,
         self.partition, 
         self.misfit,
         self.borrow,
@@ -72,15 +72,6 @@ class RegionPermutesSymbols(Constraint):
         puzzle.logTechnique('solo')
         puzzle.solution.setCell(self.region.cells[0], self.symbols)
       return []
-
-  def expandStars(self, puzzle):
-    """ For every cell in the region that has a '*' in its Placements,
-        replace the '*' with a list of all the symbols.
-    """
-    for location in self.region:
-      cell = puzzle.solution.at(location)
-      if cell == '*' or cell == ['*']:
-        puzzle.solution.setCell(location, self.symbols)
 
   def partition(self, puzzle):
     """ For every group of n cells that contain the same n symbols and no others,
