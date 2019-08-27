@@ -17,21 +17,19 @@ Next to-dos:
 * Better solving
   * Add constraint types for KenKen
     * Apply constraints
-      * Partition from known cells using inverse operator
-        Instead of replacing a constraint with a copy, just note that the solution was modified via Placements
       * Add a constraint to ensure all solution cells have either a Math constraint or are given.
         Or just enter them as Math constraints and require all 
       * Prime factorization to eliminate candidates
         But the general case is to enumerate the closure of symbols for each square, limit other square to output, and eliminate when the output isn't in symbol set
-        * Also include permutation uniqueness check
+        Is that slow, though?
+        * Also include permutation uniqueness check for the set?  Or just do that with the solution set?
   * Add more solving techniques and test with "extreme" Sudokus
+    * Tree traversal, starting with 2-symbol cells
     * Associate difficulty levels with techniques
       * Exhaust easier techniques before trying harder ones?
       * Report highest difficulty level reached
-    * Testing: check for the presence of technique names in debug output
     * Pencilmark-friendly output when can't solve: huge ASCII, or HTML?
     * Other Permutation techniques that operate between constraints
-    * Tree traversal, starting with 2-symbol cells
   * Add constraint file for Sixy Sudoku
   * Add constraint file for KaKuRo
 * Puzzle creation, with target difficulty

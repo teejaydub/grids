@@ -105,7 +105,6 @@ class RegionPermutesSymbols(RegionSymbolsConstraint):
         If there are any symbols that only occur in the other constraint's region within the intersection,
         that means they have to occur in that intersection,
         so they can be removed from the remainder of the cells in this region.
-        Make a new constraint, but just to document that something's chnaged.
     """
     for constraint in puzzle.constraints:
       if isinstance(constraint, RegionPermutesSymbols) and constraint is not self:
@@ -120,7 +119,6 @@ class RegionPermutesSymbols(RegionSymbolsConstraint):
                 s, intersection, chess.locations(remainder))
               puzzle.logTechnique('intersection')
               puzzle.solution.eliminateThroughout(remainder, [s])
-              return [self.copy()]
 
   # Utility functions:
 
