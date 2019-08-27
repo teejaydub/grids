@@ -44,10 +44,14 @@ class Puzzle:
         self.addConstraints(constraint)
     elif isinstance(constraints, str):
       self.addConstraintNamed(constraints)
-    elif isinstance(constraints, dict):
+    elif isinstance(constraints, dict) and len(constraints) > 0:
+      first = list(constraints.keys())[0]
       if 'name' in constraints:
         # Dictionary of constraint constructor properties + a class name
         self.addConstraintNamed(constraints['name'], constraints)
+      elif len(constraints) == 1 and first[0].isupper():
+        # A single capitalized word: Try loading a constraint with that name and an "initializer" property.
+        self.addConstraintNamed(first, {'initializer': constraints[first] })
       else:
         # Absorb all named Puzzle properties we recognize.
         self.setDimensions(constraints.get('dimensions', None))
@@ -60,11 +64,14 @@ class Puzzle:
   def addConstraintNamed(self, c, new_args={}):
     """ Adds a constraint with the given name, if we know it.
         Pass the specified arguments to its constructor.
+        Otherwise, if the constraint is a string containing '=', load a Math equation.
         Otherwise, if it's the name of a file in theh current directory,
         optionally with the suffix ".yml" or ".yaml", load constraints from that file.
         Otherwise, raise an exception.
     """
     logging.debug("loading constraint: %s", c)
+    if isinstance(c, str) and '=' in c:
+      return self.addConstraintNamed('Math', {'initializer': c})
     for extension in ['', '.yml', '.yaml']:
       if self.tryLoad(c + extension):
         return

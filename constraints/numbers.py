@@ -1,4 +1,5 @@
 import logging
+import re
 
 from .constraint import Constraint
 from .region import Region
@@ -41,15 +42,34 @@ class MathOp(Constraint):
     self.isCommutative = isCommutative
 
   def __str__(self):
-    return super().__str__() + ': '+ str(self.region) + ' = ' + str(self.target)
+    return super().__str__() + ': '+ self.region.display(self.operatorName, brackets=False) + ' = ' + str(self.target)
 
   def apply(self, puzzle):
     return [self]
 
-class Math:
+class Math(MathOp):
   """ Convenience for more compact typing in input YAML.
+      >>> print(Math("a1+a2+a3 = 6").apply(None)[0])
+      SumIs: a1+a2+a3 = 6
   """
-  pass
+  def __init__(self, initializer):
+    leftside, rightside = initializer.split('=')
+    operator = re.search('[+-/*x]', leftside).group()
+    squares = leftside.split(operator)
+    super().__init__(squares, None, operator, int(rightside.strip()))
+
+  def apply(self, puzzle):
+    """ Chain to the appropriate specific operator class. """
+    if self.operatorName == '+':
+      return [SumIs(self.region, self.target)]
+    if self.operatorName == '-':
+      return [DifferenceIs(self.region, self.target)]
+    if self.operatorName == '/':
+      return [QuotientIs(self.region, self.target)]
+    if self.operatorName in '*x':
+      return [ProductIs(self.region, self.target)]
+    else:
+      return []
 
 class SumIs(MathOp):
   """ A MathOp for addition. """

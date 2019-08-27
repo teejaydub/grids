@@ -16,8 +16,9 @@ Next to-dos:
 
 * Better solving
   * Add constraint types for KenKen
-    * Change Region to output using chess notation?  More legible; better for round-tripping later during create
-    * Refine input so you can say "Math: a1+a2+a3 = 6"
+    * Refine input so you can say "Math: a1+a2+a3 = 6" or just "a1+a2+a3 = 6"
+    * Apply constraints
+      * Partition from known cells using inverse operator
   * Add more solving techniques and test with "extreme" Sudokus
     * Associate difficulty levels with techniques
       * Exhaust easier techniques before trying harder ones?
@@ -30,6 +31,7 @@ Next to-dos:
   * Add constraint file for KaKuRo
 * Puzzle creation, with target difficulty
 * Code improvements
+  * There are a lot of empty Regions constructed - is that something we can optimize out?
   * symbolsAreChars: simplify output further?  Simplify input?
   * Better input error handling
     Its own exception type, with more helpful context and suggestions?

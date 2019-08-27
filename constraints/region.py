@@ -120,7 +120,21 @@ class Region():
       raise Exception("Don't know how to create a Region from " + str(region))
 
   def __str__(self):
-    return '[' + ' '.join([locationToChessSquare(c) for c in self.cells]) + ']'
+    return self.display()
+
+  def display(self, sep=' ', brackets=True):
+    """ Return a display string in chess notation, using the given separator between squares.
+        >>> Region([(0,0), (0,1)]).display()
+        '[a1 a2]'
+        >>> Region([(0,0), (0,1)]).display(', ')
+        '[a1, a2]'
+        >>> Region([(0,0), (0,1)]).display(', ', brackets=False)
+        'a1, a2'
+    """
+    result = sep.join([locationToChessSquare(c) for c in self.cells])
+    if brackets:
+      result = '[' + result + ']'
+    return result
 
   def __iter__(self):
     """ Yield the coordinate tuples in the Region. """
