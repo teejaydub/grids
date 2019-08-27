@@ -5,6 +5,17 @@ import operator
 from .constraint import Constraint
 from . import chess
 
+def subtractLists(alist, blist):
+  """ Return list a with all elements that match an element in b removed.
+      >>> subtractLists([1, 2, 3], [3])
+      [1, 2]
+      >>> subtractLists(['1', '2', '3'], ['1'])
+      ['2', '3']
+      >>> subtractLists([[0, 0], [0, 1]], [[0, 0]])
+      [[0, 1]]
+  """
+  return [a for a in alist if not a in blist]
+
 class Region():
   def __init__(self, region):
     """ Regions can be specified by a string of two chess-style coordinates separated by a dash,
@@ -114,6 +125,13 @@ class Region():
     """
     return Region([cell for cell in other if cell in self.cells])
 
+  def subtract(self, other):
+    """ Return a Region that contains all cells in self that aren't in other.
+        >>> print(Region('a1-b2').subtract(Region('a1 c5')))
+        [a2 b1 b2]
+    """
+    return Region([cell for cell in self if not cell in other])
+
 class RegionConstraint(Constraint):
   """ A Constraint that is applied over a Region. """
   def __init__(self, region):
@@ -121,7 +139,7 @@ class RegionConstraint(Constraint):
     self.region = Region(region)
 
   def techniques(self):
-    return super().techniques() + [self.empty, self.solo]
+    return super().techniques() + [self.empty]
 
   def empty(self, puzzle):
     """ Catch any empty constraints and discard them. """
@@ -141,7 +159,14 @@ class RegionSymbolsConstraint(RegionConstraint):
     return super().__str__() + ': ' + self.showSymbols(self.symbols) + ' in ' + str(self.region)
 
   def techniques(self):
-    return super().techniques() + [self.solo]
+    return super().techniques() + [self.notAllowed, self.solo, self.filter]
+
+  def notAllowed(self, puzzle):
+    """ Eliminate any symbols from this constraint that aren't in the puzzle's symbol set. """
+    if puzzle.symbols:
+      bad = subtractLists(self.symbols, puzzle.symbols)
+      if bad:
+        return [RegionSymbolsConstraint(self.region, subtractLists(self.symbols, bad))]
 
   def solo(self, puzzle):
     """ If there's only one symbol, it must be the symbol for a single cell.
@@ -153,3 +178,10 @@ class RegionSymbolsConstraint(RegionConstraint):
         puzzle.logTechnique('solo')
         puzzle.solution.setCell(self.region.cells[0], self.symbols)
       return []
+
+  def filter(self, puzzle):
+    """ Eliminate any symbols from this region that aren't in the constraint's symbol set.
+    """
+    bad = subtractLists(puzzle.symbols, self.symbols)
+    if bad:
+      puzzle.solution.eliminateThroughout(self.region, bad)

@@ -18,6 +18,9 @@ Next to-dos:
   * Add constraint types for KenKen
     * Apply constraints
       * Partition from known cells using inverse operator
+        Instead of replacing a constraint with a copy, just note that the solution was modified via Placements
+      * Add a constraint to ensure all solution cells have either a Math constraint or are given.
+        Or just enter them as Math constraints and require all 
       * Prime factorization to eliminate candidates
         But the general case is to enumerate the closure of symbols for each square, limit other square to output, and eliminate when the output isn't in symbol set
         * Also include permutation uniqueness check

@@ -2,18 +2,7 @@ import logging
 
 from . import chess
 from .constraint import Constraint
-from .region import Region, RegionSymbolsConstraint
-
-def subtractLists(alist, blist):
-  """ Return list a with all elements that match an element in b removed.
-      >>> subtractLists([1, 2, 3], [3])
-      [1, 2]
-      >>> subtractLists(['1', '2', '3'], ['1'])
-      ['2', '3']
-      >>> subtractLists([[0, 0], [0, 1]], [[0, 0]])
-      [[0, 1]]
-  """
-  return [a for a in alist if not a in blist]
+from .region import Region, RegionSymbolsConstraint, subtractLists
 
 class RegionPermutesSymbols(RegionSymbolsConstraint):
   """ The core logic for regions containing each symbol in a set,
@@ -126,7 +115,7 @@ class RegionPermutesSymbols(RegionSymbolsConstraint):
           # logging.debug("Intersection index: %s", index)
           for s, locations in index.items():
             if intersection.hasSubset(locations):
-              remainder = subtractLists(self.region, intersection)
+              remainder = self.region.subtract(intersection)
               logging.debug("Intersection: %s occurs only in %s, so remove it from %s",
                 s, intersection, chess.locations(remainder))
               puzzle.logTechnique('intersection')
@@ -139,7 +128,7 @@ class RegionPermutesSymbols(RegionSymbolsConstraint):
     """ Return a new RegionPermutesSymbols constraint, by subtracting the given locations and symbols
         from this region's locations and symbols.
     """
-    remainderLocations = subtractLists(self.region.cells, locations)
+    remainderLocations = self.region.subtract(locations)
     remainderSymbols = subtractLists(self.symbols, symbols)
     return RegionPermutesSymbols(remainderLocations, remainderSymbols)
 

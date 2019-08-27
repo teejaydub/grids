@@ -182,21 +182,24 @@ class Puzzle:
     """ Apply all constraints.
         Remove all the finished ones.
         Return true if something changed - if there are a different set of constraints
-        as a result of the reduction.
+        as a result of the reduction, or if the solution changed.
     """
     # This is the simplest implementation, but it can't tell when anything changes.
     # self.constraints = [c.apply(self) for c in self.constraints]
-    result = False
+    constraintsChanged = False
+    self.solution.changed = False
+
     self.expandStars()
     newConstraints = []
     for c in self.constraints:
       changes = c.apply(self)
       if changes != [c]:
-        result = True
+        constraintsChanged = True
       newConstraints.extend(changes)
     self.constraints = newConstraints
+    
     self.stats['passes'] += 1
-    return result
+    return constraintsChanged or self.solution.changed
 
   def logTechnique(self, name):
     """ Notes down the use of a named technique while solving. """

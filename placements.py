@@ -18,6 +18,7 @@ class Placements():
   """
   # A list of lists (for two dimensions), each cell of which contains a list of possible symbols.
   cells = None
+  changed = False
 
   def __init__(self, initial):
     self.cells = self.parse(initial)
@@ -101,14 +102,19 @@ class Placements():
     if isinstance(contents, str):
       # If I set it to a single symbol, make it into a list.
       contents = [contents]
-    self.cells[location[0]][location[1]] = contents
+    if self.cells[location[0]][location[1]] != contents:
+      self.cells[location[0]][location[1]] = contents
+      self.changed = True
 
   def eliminateAt(self, location, symbols):
     """ Remove the given list of symbols from this placement 
         at the given coordinates.
     """
     cell = self.cells[location[0]][location[1]]
-    self.setCell(location, [s for s in cell if not s in symbols])
+    new = [s for s in cell if not s in symbols]
+    if new != cell:
+      self.setCell(location, new)
+      self.changed = True
 
   def eliminateThroughout(self, locations, symbols):
     """ Remove the given list of symbols from this placement

@@ -20,11 +20,11 @@
   target: 4
 
 # Shorthand, using the Math convenience class:
-- Math: e1*f1*g1 = 30
+- Math: a5*a6*a7 = 30
 - Math: b2*b3=30
 - Math: b5+c5+d5 = 18
 - Math: b6/b7 = 2
-- Math: c1+c2+c3+c4 = 15
+- Math: c1+c2+d1+d2 = 15
 - Math: c4/d4 = 2
 - Math: c6/c7 = 3
 
@@ -33,7 +33,7 @@
 - d7/e7 = 3
 - e2-f2 = 3
 - e4-f4 = 4
-- e5-f5 = 3
+- e5-e6 = 3
 - f1+g1+g2 = 10
 - f5+g5+g6 = 11
 - f6+f7+g7 = 17
