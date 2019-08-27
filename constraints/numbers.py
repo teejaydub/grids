@@ -46,6 +46,11 @@ class MathOp(Constraint):
   def apply(self, puzzle):
     return [self]
 
+class Math:
+  """ Convenience for more compact typing in input YAML.
+  """
+  pass
+
 class SumIs(MathOp):
   """ A MathOp for addition. """
   def __init__(self, region, target):

@@ -37,17 +37,19 @@ class RegionPermutesSymbols(Constraint):
     return RegionPermutesSymbols(self.region, self.symbols)
 
   def apply(self, puzzle):
-    # Apply all the techniques in order of difficulty, stopping when one has results.
-    for technique in [
-      self.empty, self.solo, self.expandStars,
-      self.partition, 
-      self.misfit,
-      self.borrow,
-      self.intersection
-    ]:
-      result = technique(puzzle)
-      if result is not None:
-        return result
+    # Wait until we've initializd the solution and symbol set.
+    if puzzle.solution and puzzle.symbols:
+      # Apply all the techniques in order of difficulty, stopping when one has results.
+      for technique in [
+        self.empty, self.solo, self.expandStars,
+        self.partition, 
+        self.misfit,
+        self.borrow,
+        self.intersection
+      ]:
+        result = technique(puzzle)
+        if result is not None:
+          return result
 
     # If nothing produced new constraints, keep this one.
     return [self]

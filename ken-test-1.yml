@@ -1,14 +1,34 @@
 - KenKen
-- name: SumIs
-  region: [a1 a2 a3]
-  target: 17
 - initial: |
-    **3*1****
-    4**56*2*9
-    7****81**
-    *8*1****3
-    **18*94**
-    3****4*8*
-    **59****7
-    2*9*53**4
-    ****4*9**
+    *******
+    *******
+    **5****
+    *****5*
+    7******
+    *******
+    *******
+- name: DifferenceIs
+  region: a1 b1
+  target: 5
+- name: SumIs
+  region: a2 a3
+  target: 5
+- name: DifferenceIs
+  region: a4 b4
+  target: 4
+- Math: e1*f1*g1 = 30
+- Math: b2*b3=30
+- Math: b5+c5+d5 = 18
+- Math: b6/b7 = 2
+- Math: c1+c2+c3+c4 = 15
+- Math: c4/d4 = 2
+- Math: c6/c7 = 3
+- d3+e3+f3 = 13
+- d7/e7 = 3
+- e2-f2 = 3
+- e4-f4 = 4
+- e5-f5 = 3
+- f1+g1+g2 = 10
+- f5+g5+g6 = 11
+- f6+f7+g7 = 17
+- g3/g4 = 3
