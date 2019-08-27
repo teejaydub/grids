@@ -17,8 +17,8 @@ Next to-dos:
 * Better solving
   * Add constraint types for KenKen
     * Apply constraints
-      * First partition is incorrect - how is it happening?
       * Partition from known cells using inverse operator
+        Factor out RegionConstraint
       * Prime factorization to eliminate candidates
         But the general case is to enumerate the closure of symbols for each square, limit other square to output, and eliminate when the output isn't in symbol set
         * Also include permutation uniqueness check
@@ -34,6 +34,7 @@ Next to-dos:
   * Add constraint file for KaKuRo
 * Puzzle creation, with target difficulty
 * Code improvements
+  * Many redundant partitions - if one of the constraints has just one cell, can we short-circuit it?
   * There are a lot of empty Regions constructed - is that something we can optimize out?
   * symbolsAreChars: simplify output further?  Simplify input?
   * Better input error handling

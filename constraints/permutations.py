@@ -2,7 +2,7 @@ import logging
 
 from . import chess
 from .constraint import Constraint
-from .region import Region
+from .region import Region, RegionConstraint
 
 def subtractLists(alist, blist):
   """ Return list a with all elements that match an element in b removed.
@@ -15,7 +15,7 @@ def subtractLists(alist, blist):
   """
   return [a for a in alist if not a in blist]
 
-class RegionPermutesSymbols(Constraint):
+class RegionPermutesSymbols(RegionConstraint):
   """ The core logic for regions containing each symbol in a set,
       where each symbol appears in exactly one square in the region.
       The region must have the same number of squares as there are symbols in the set.
@@ -24,7 +24,7 @@ class RegionPermutesSymbols(Constraint):
     """ Regions are passed using string formats defined in the Region class.
         The symbol set is a list of strings.
     """
-    self.region = Region(region)
+    super().__init__(region)
     self.symbols = symbols
     # logging.debug("RegionPermutesSymbols(%s, %s)", region, symbols)
     if len(symbols) != len(self.region.cells):
@@ -37,31 +37,16 @@ class RegionPermutesSymbols(Constraint):
     """ Make a distinct duplicate. """
     return RegionPermutesSymbols(self.region, self.symbols)
 
-  def apply(self, puzzle):
-    # Wait until we've initializd the solution and symbol set.
-    if puzzle.solution and puzzle.symbols:
-      # Apply all the techniques in order of difficulty, stopping when one has results.
-      for technique in [
-        self.empty, self.solo,
-        self.partition, 
-        self.misfit,
-        self.borrow,
-        self.intersection
-      ]:
-        result = technique(puzzle)
-        if result is not None:
-          return result
-
-    # If nothing produced new constraints, keep this one.
-    return [self]
-
 # Solving techniques, from trivial to easy to harder:
 
-  def empty(self, puzzle):
-    """ Catch any empty constraints and discard them. """
-    if len(self.symbols) == 0:
-      logging.debug("discarding empty region")
-      return []
+  def techniques(self):
+    return super().techniques() + [
+      self.solo, 
+      self.partition, 
+      self.misfit, 
+      self.borrow,
+      self.intersection
+    ]
 
   def solo(self, puzzle):
     """ If there's only one symbol, it must be the symbol for a single cell.

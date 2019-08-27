@@ -2,6 +2,7 @@ from functools import reduce
 import logging
 import operator
 
+from .constraint import Constraint
 from . import chess
 
 class Region():
@@ -112,3 +113,18 @@ class Region():
         [a1 a2]
     """
     return Region([cell for cell in other if cell in self.cells])
+
+class RegionConstraint(Constraint):
+  """ A Constraint that is applied over a Region. """
+  def __init__(self, region):
+    super().__init__()
+    self.region = Region(region)
+
+  def techniques(self):
+    return super().techniques() + [self.empty]
+
+  def empty(self, puzzle):
+    """ Catch any empty constraints and discard them. """
+    if self.region.isEmpty():
+      logging.debug("discarding empty region")
+      return []
