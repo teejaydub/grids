@@ -121,10 +121,35 @@ class RegionConstraint(Constraint):
     self.region = Region(region)
 
   def techniques(self):
-    return super().techniques() + [self.empty]
+    return super().techniques() + [self.empty, self.solo]
 
   def empty(self, puzzle):
     """ Catch any empty constraints and discard them. """
     if self.region.isEmpty():
       logging.debug("discarding empty region")
+      return []
+
+class RegionSymbolsConstraint(RegionConstraint):
+  """ A RegionConstraint that knows a subset of the puzzle's symbols
+      that can be used within its region.
+  """
+  def __init__(self, region, symbols):
+    super().__init__(region)
+    self.symbols = symbols
+
+  def __str__(self):
+    return super().__str__() + ': ' + self.showSymbols(self.symbols) + ' in ' + str(self.region)
+
+  def techniques(self):
+    return super().techniques() + [self.solo]
+
+  def solo(self, puzzle):
+    """ If there's only one symbol, it must be the symbol for a single cell.
+        Set that in the solution, and then we're done with this constraint.
+    """
+    if len(self.symbols) == 1:  # Only one symbol is possible
+      if puzzle.solution.at(self.region.cells[0]) != self.symbols:  # don't log if it's redundant
+        logging.debug("Solo: Placing %s at %s", self.symbols[0], chess.location(self.region.cells[0]))
+        puzzle.logTechnique('solo')
+        puzzle.solution.setCell(self.region.cells[0], self.symbols)
       return []

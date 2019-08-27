@@ -2,7 +2,7 @@ import logging
 
 from . import chess
 from .constraint import Constraint
-from .region import Region, RegionConstraint
+from .region import Region, RegionSymbolsConstraint
 
 def subtractLists(alist, blist):
   """ Return list a with all elements that match an element in b removed.
@@ -15,7 +15,7 @@ def subtractLists(alist, blist):
   """
   return [a for a in alist if not a in blist]
 
-class RegionPermutesSymbols(RegionConstraint):
+class RegionPermutesSymbols(RegionSymbolsConstraint):
   """ The core logic for regions containing each symbol in a set,
       where each symbol appears in exactly one square in the region.
       The region must have the same number of squares as there are symbols in the set.
@@ -24,14 +24,10 @@ class RegionPermutesSymbols(RegionConstraint):
     """ Regions are passed using string formats defined in the Region class.
         The symbol set is a list of strings.
     """
-    super().__init__(region)
-    self.symbols = symbols
+    super().__init__(region, symbols)
     # logging.debug("RegionPermutesSymbols(%s, %s)", region, symbols)
     if len(symbols) != len(self.region.cells):
       raise Exception("Can't permute " + str(symbols) + " over " + str(self.region))
-
-  def __str__(self):
-    return super().__str__() + ': ' + self.showSymbols(self.symbols) + ' in ' + str(self.region)
 
   def copy(self):
     """ Make a distinct duplicate. """
@@ -41,23 +37,11 @@ class RegionPermutesSymbols(RegionConstraint):
 
   def techniques(self):
     return super().techniques() + [
-      self.solo, 
       self.partition, 
       self.misfit, 
       self.borrow,
       self.intersection
     ]
-
-  def solo(self, puzzle):
-    """ If there's only one symbol, it must be the symbol for a single cell.
-        Set that in the solution, and then we're done with this constraint.
-    """
-    if len(self.symbols) == 1:  # Only one symbol is possible
-      if puzzle.solution.at(self.region.cells[0]) != self.symbols:  # don't log if it's redundant
-        logging.debug("Solo: Placing %s at %s", self.symbols[0], chess.location(self.region.cells[0]))
-        puzzle.logTechnique('solo')
-        puzzle.solution.setCell(self.region.cells[0], self.symbols)
-      return []
 
   def partition(self, puzzle):
     """ For every group of n cells that contain the same n symbols and no others,
