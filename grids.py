@@ -17,16 +17,20 @@ def cli():
 @click.option('--normal-output', 'loglevel', flag_value=logging.WARNING, help="Normal output", default=True)
 @click.option('-v', '--verbose', 'loglevel', flag_value=logging.INFO, help="More output")
 @click.option('-d', '--debug', 'loglevel', flag_value=logging.DEBUG, help="Debugging output")
-def solve(input, loglevel):
+@click.option('-s', '--single-step', 'singleStep', flag_value=True, help="Pause at each step while solving")
+def solve(input, loglevel, singleStep):
   """ Solve a puzzle specified by one or more INPUT constraints files. """
   logging.basicConfig(format='%(message)s', level=loglevel)
 
   p = puzzle.Puzzle()
+  if singleStep:
+    p.techniqueCallback = showStep
   for i in input:
     p.addConstraints(i)
   logging.info("Puzzle:")
   logging.info(p)
   logging.info("\nSolving...")
+
   result = p.solve();
 
   # Report stats but not using logging - so it's available to regression tests.
@@ -43,6 +47,10 @@ def solve(input, loglevel):
     click.echo("Can't solve.")
     click.echo("Best solution:")
     click.echo(p)
+
+def showStep(name):
+  if not click.pause():
+    raise click.Abort()
 
 @cli.command()
 @click.option('-v/-q', '--verbose/--quiet', 'verbose')

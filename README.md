@@ -16,9 +16,12 @@ Next to-dos:
 
 * Better solving
   * Add constraint types for KenKen
-    * Refine input so you can say "Math: a1+a2+a3 = 6" or just "a1+a2+a3 = 6"
     * Apply constraints
+      * First partition is incorrect - how is it happening?
       * Partition from known cells using inverse operator
+      * Prime factorization to eliminate candidates
+        But the general case is to enumerate the closure of symbols for each square, limit other square to output, and eliminate when the output isn't in symbol set
+        * Also include permutation uniqueness check
   * Add more solving techniques and test with "extreme" Sudokus
     * Associate difficulty levels with techniques
       * Exhaust easier techniques before trying harder ones?
