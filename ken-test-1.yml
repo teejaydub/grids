@@ -1,6 +1,6 @@
 - KenKen
 - name: SumIs
-  region: [a1, a2, a3]
+  region: [a1 a2 a3]
   target: 17
 - initial: |
     **3*1****

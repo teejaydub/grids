@@ -30,7 +30,7 @@ class RegionPermutesSymbols(Constraint):
       raise Exception("Can't permute " + str(symbols) + " over " + str(self.region))
 
   def __str__(self):
-    return super().__str__() + ': ' + str(self.symbols) + ' in ' + str(self.region)
+    return super().__str__() + ': ' + self.showSymbols(self.symbols) + ' in ' + str(self.region)
 
   def copy(self):
     """ Make a distinct duplicate. """

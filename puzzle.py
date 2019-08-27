@@ -32,7 +32,7 @@ class Puzzle:
       >>> p.addConstraints(['Unknown'])
       Traceback (most recent call last):
       ...
-      Exception: Can't find a constraint named Unknown
+      Exception: Can't load constraint Unknown: {}
     """
     if constraints is None:
       return
@@ -75,7 +75,7 @@ class Puzzle:
       constraint = constraintClass(**new_args)
       self.constraints.append(constraint)
     except:
-      raise Exception("Can't find a constraint named " + c)
+      raise Exception("Can't load constraint " + c + ': ' + str(new_args))
 
   def tryLoad(self, filename):
     """ If filename exists, load constraints from it and return True.

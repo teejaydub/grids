@@ -34,3 +34,8 @@ class Constraint:
 
   def __str__(self):
     return self.__class__.__name__
+
+  def showSymbols(self, symbols):
+    """ Formats a list of symbols, returning a string.
+    """
+    return '[' + ' '.join([s for s in symbols]) + ']'

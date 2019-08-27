@@ -48,19 +48,28 @@ def parseChessList(chess):
       []
       >>> parseChessList('b1-b2')
       [(1, 0), (1, 1)]
-      >>> parseChessList('a1, b1-b2, c2')
+      >>> parseChessList('a1, b1-b2 c2')
       [(0, 0), (1, 0), (1, 1), (2, 1)]
       >>> parseChessList('d3')
       [(3, 2)]
   """
   result = []
-  for c in chess.split(','):
-    c = c.strip()
+  for c in chess.split(' '):
+    c = c.strip(' ,')
     if '-' in c:
       result.extend(parseChessRect(c))
     elif len(c):
       result.append(parseChessSquare(c))
   return result
+
+def locationToChessSquare(location):
+  """ Given a pair of zero-relative coordinates, return a string naming a chess-style square.
+      >>> locationToChessSquare((0, 0))
+      'a1'
+  """
+  if not isinstance(location, (list, tuple)) or not isinstance(location[0], int):
+    raise Exception("Expecting location, got '" + str(location) + "'")
+  return chr(ord('a') + location[0]) + str(location[1] + 1)
 
 class Region():
   def __init__(self, region):
@@ -70,17 +79,19 @@ class Region():
 
         Examples:
         >>> str(Region('a1-b2'))
-        '[(0, 0), (0, 1), (1, 0), (1, 1)]'
+        '[a1 a2 b1 b2]'
+        >>> str(Region('a1 a2 b3'))
+        '[a1 a2 b3]'
         >>> str(Region([(0,0),(0,1),(1,0)]))
-        '[(0, 0), (0, 1), (1, 0)]'
+        '[a1 a2 b1]'
         >>> str(Region([1, 2]))
-        '[(0, 0), (0, 1)]'
+        '[a1 a2]'
         >>> str(Region([1, 1]))
-        '[(0, 0)]'
+        '[a1]'
         >>> str(Region([0, 0]))
         '[]'
         >>> str(Region((1, 1)))
-        '[(0, 0)]'
+        '[a1]'
     """
     if isinstance(region, str):
       # Strings are parsed as chess notation.
@@ -95,17 +106,21 @@ class Region():
         # A list of strings: interpret individual elements as chess notation.
         self.cells = []
         for s in region:
-          self.cells.append(parseChessList(s))
-      else:
+          self.cells.extend(parseChessList(s))
+      elif len(region) > 0 and isinstance(region[0], (list, tuple)) and len(region[0]) > 0 and isinstance(region[0][0], int):
         # List of coordinate tuples.
         self.cells = region
+      elif len(region) == 0:
+        self.cells = []
+      else:
+        raise Exception("Don't know how to create a Region from " + str(region))
     elif isinstance(region, Region):
       self.cells = region.cells
     else:
       raise Exception("Don't know how to create a Region from " + str(region))
 
   def __str__(self):
-    return str(self.cells)
+    return '[' + ' '.join([locationToChessSquare(c) for c in self.cells]) + ']'
 
   def __iter__(self):
     """ Yield the coordinate tuples in the Region. """
@@ -144,6 +159,6 @@ class Region():
   def intersect(self, other):
     """ Return a Region that contains all cells that are in both self and other. 
         >>> print(Region('a1-b2').intersect(Region('a1-a9')))
-        [(0, 0), (0, 1)]
+        [a1 a2]
     """
     return Region([cell for cell in other if cell in self.cells])
