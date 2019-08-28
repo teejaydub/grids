@@ -57,10 +57,10 @@ class MathOp(RegionConstraint):
     """ Technique to set the target value as a symbol if the region contains only one cell. """
     if puzzle.symbols and puzzle.solution:
       if self.region.size() == 1:
-        assert str(self.target) in puzzle.symbols
         assert self.isCommutative  # otherwise, you shouldn't end up with a single cell
         logging.debug("Single value: %s has a target value of %s",
           chess.location(self.region.cells[0]), self.target)
+        assert str(self.target) in puzzle.symbols
         puzzle.logTechnique('singleValue')
         puzzle.solution.setCell(self.region.cells[0], str(self.target))
         return []
@@ -77,7 +77,7 @@ class MathOp(RegionConstraint):
           if self.isCommutative:
             # For + and *, we can just apply the inverse operator to our current target to find the new target.
             new = copy.copy(self)
-            new.target = self.inverse(self.target, value)
+            new.target = round(self.inverse(self.target, value))
             new.region = self.region.subtract([location])
             logging.debug("Remove known: since %s and %s = %s, %s %s %s = %s",
               self, chess.location(location), value, self.target, self.inverseName, value, new.target)
@@ -89,6 +89,9 @@ class MathOp(RegionConstraint):
             assert self.region.size() == 2
             a = str(self.inverse(self.target, value))
             b = str(self.operator(value, self.target))
+
+            # TODO: If b is not an integer, it's not an option.
+
             logging.debug("Remove known: since %s and %s = %s, %s is %s or %s",
               self, chess.location(location), value, self.region.subtract([location]), a, b)
             puzzle.logTechnique('removeKnown')
@@ -143,9 +146,20 @@ class ProductIs(MathOp):
     """ Figure out the possible symbols for this region using prime factors.
         All symbols must either be prime factors, or products of prime factors.
     """
-    # Step through all combinations of the factors of the target.
-    for factors in factorizations(self.target, self.region.size()):
-      pass
+    if puzzle.symbols and puzzle.solution:
+      # Step through all combinations of the factors of the target.
+      factorSymbols = set()
+      for factors in factorizations(self.target, self.region.size()):
+        sFactors = set([str(f) for f in factors])
+        # Include a factorization only if all its factors are valid symbols in the puzzle.
+        if sFactors.intersection(puzzle.symbols) == sFactors:
+          factorSymbols.update(sFactors)
+
+      # No other symbols can be part of this region.
+      if len(factorSymbols) < len(puzzle.symbols):
+        logging.debug("Prime factors: only include %s as factors of %s within %s",
+          self.showSymbols(factorSymbols), self.target, self.region)
+        puzzle.solution.intersectThroughout(self.region, factorSymbols)
 
 class QuotientIs(MathOp):
   """ A MathOp for division. """

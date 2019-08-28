@@ -221,13 +221,18 @@ class Puzzle:
     # Collect some stats as we go.
     self.stats = {'passes': 0, 'techniques': {} }
     # Reduce the constraints as far as possible analytically.
-    while self.reduceConstraints():
+    while self.reduceConstraints() and not (self.isSolved() or self.isUnsolvable()):
       logging.debug("\nReduced:\n%s", self)
     return self.isSolved()
 
   def isSolved(self):
-    """ Return True if the solution is complete - with only one symbol placement per cell.
-    """
+    " Return True if the solution is complete - with only one symbol placement per cell. "
     if not self.solution:
       return False
     return self.solution.isSolved()
+
+  def isUnsolvable(self):
+    " Return True if the puzzle can't be solved - some cells have no placement options. "
+    if not self.solution:
+      return False
+    return self.solution.isUnsolvable()

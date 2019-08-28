@@ -29,7 +29,7 @@ class Constraint:
     """ Formats a list of symbols, returning a string.
         It's here just because it's a convenient place to standardize it.
     """
-    return '(' + ' '.join([s for s in symbols]) + ')'
+    return '(' + ' '.join(sorted([s for s in symbols])) + ')'
 
   def apply(self, puzzle):
     """ Apply this constraint to the given puzzle.

@@ -83,9 +83,21 @@ class Placements():
         False
     """
     for cell in self.all():
-      if len(cell) != 1:
+      if len(cell) != 1 or cell == '*':
         return False
     return True
+
+  def isUnsolvable(self):
+    """ Return True if at least one cell contains no items.
+        >>> Placements([[[]], [['1']]]).isUnsolvable()
+        True
+        >>> Placements([[['1'], [['2', '3']]]]).isUnsolvable()
+        False
+    """
+    for cell in self.all():
+      if cell == []:
+        return True
+    return False
 
   def at(self, location):
     """ Returns the contents of the grid cell at the specified coordinates (a list or tuple).
@@ -127,3 +139,19 @@ class Placements():
     """
     for location in locations:
       self.eliminateAt(location, symbols)
+
+  def intersectAt(self, location, symbols):
+    """ Eliminate symbols other than the given ones for the given location. """
+    cell = self.cells[location[0]][location[1]]
+    if cell == ['*'] or cell == '*':
+      new = [s for s in symbols]
+    else:
+      new = [s for s in cell if s in symbols]
+    if new != cell:
+      self.setCell(location, new)
+      self.changed = True
+
+  def intersectThroughout(self, locations, symbols):
+    """ Only the given symbols are valid within the given locations. """
+    for location in locations:
+      self.intersectAt(location, symbols)

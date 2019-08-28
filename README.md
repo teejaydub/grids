@@ -18,8 +18,12 @@ Next to-dos:
   * Add constraint types for KenKen
     * Apply constraints
       * Prime factorization to eliminate candidates
-        * Shouldn't we be using sets for symbols?  Seems like the 'in' tests might be more efficient?
+        * Only "count" and announce the Prime Factors technique when it changes something.
+        * Check values for symbol-set legality in singleValue.
+        * What about a RegionSymbolSets constraint, that allows for several alternative sets of symbols, one of which must be used intact?
+          If that gets down to one alternative, and its symbols are unique, it can be replaced with a RegionPermutesSymbols constraint.
         * Also include permutation uniqueness check for the set?  Or just do that with the solution set?
+          E.g., if my cells are all in line, I can't have "2 2 6"
       * If a MathOp constraint's region is a subset of a PermuteSymbolsConstraint's region, you can eliminate repetitions like n/2 for +
   * Add more solving techniques and test with "extreme" Sudokus
     * Tree traversal, starting with 2-symbol cells
@@ -32,6 +36,7 @@ Next to-dos:
   * Add constraint file for KaKuRo
 * Puzzle creation, with target difficulty
 * Code improvements
+  * Shouldn't we be using sets for symbols?  Seems like the 'in' tests might be more efficient, as well as eliminations, etc.
   * Many redundant partitions - if one of the constraints has just one cell, can we short-circuit it?
   * There are a lot of empty Regions constructed - is that something we can optimize out?
   * symbolsAreChars: simplify output further?  Simplify input?
