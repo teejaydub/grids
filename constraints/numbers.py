@@ -1,8 +1,10 @@
 import copy
 import logging
+import math
 import re
 
 from . import chess
+from .factoring import *
 from .constraint import Constraint
 from .region import Region, RegionConstraint, RegionSymbolsConstraint
 
@@ -122,22 +124,33 @@ class Math(MathOp):
 class SumIs(MathOp):
   """ A MathOp for addition. """
   def __init__(self, region, target):
-    super().__init__(region, lambda x,y: x + y, '+', lambda x,y: x - y, '-', target)
+    super().__init__(region, sumF, '+', differenceF, '-', target)
 
 class DifferenceIs(MathOp):
   """ A MathOp for subtraction. """
   def __init__(self, region, target):
-    super().__init__(region, lambda x,y: x - y, '-', lambda x,y: x + y, '+', target, isCommutative=False)
+    super().__init__(region, differenceF, '-', sumF, '+', target, isCommutative=False)
 
 class ProductIs(MathOp):
   """ A MathOp for multiplication. """
   def __init__(self, region, target):
-    super().__init__(region, lambda x,y: x * y, '*', lambda x,y: x / y, '/', target)
+    super().__init__(region, productF, '*', quotientF, '/', target)
+
+  def techniques(self):
+    return super().techniques() + [self.primeFactors]
+
+  def primeFactors(self, puzzle):
+    """ Figure out the possible symbols for this region using prime factors.
+        All symbols must either be prime factors, or products of prime factors.
+    """
+    # Step through all combinations of the factors of the target.
+    for factors in factorizations(self.target, self.region.size()):
+      pass
 
 class QuotientIs(MathOp):
   """ A MathOp for division. """
   def __init__(self, region, target):
-    super().__init__(region, lambda x,y: x / y, '/', lambda x,y: x * y, '*', target, isCommutative=False)
+    super().__init__(region, quotientF, '/', productF, '*', target, isCommutative=False)
 
 class AllCellsMustHaveMathOp(Constraint):
   """ Require that every cell in the puzzle be included in a MathOp constraint's region.

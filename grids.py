@@ -59,7 +59,7 @@ def test(verbose):
   # Using docstrings:
   import doctest
   import placements
-  from constraints import chess, region, permutations, numbers
+  from constraints import chess, region, permutations, numbers, factoring
   doctest.testmod(verbose=verbose)
   doctest.testmod(chess, verbose=verbose)
   doctest.testmod(numbers, verbose=verbose)
@@ -67,6 +67,7 @@ def test(verbose):
   doctest.testmod(placements, verbose=verbose)
   doctest.testmod(puzzle, verbose=verbose)
   doctest.testmod(region, verbose=verbose)
+  doctest.testmod(factoring, verbose=verbose)
 
   # Test command-line interface and solving:
   from click.testing import CliRunner

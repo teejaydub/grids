@@ -2,19 +2,9 @@ from functools import reduce
 import logging
 import operator
 
+from .listutils import subtractLists
 from .constraint import Constraint
 from . import chess
-
-def subtractLists(alist, blist):
-  """ Return list a with all elements that match an element in b removed.
-      >>> subtractLists([1, 2, 3], [3])
-      [1, 2]
-      >>> subtractLists(['1', '2', '3'], ['1'])
-      ['2', '3']
-      >>> subtractLists([[0, 0], [0, 1]], [[0, 0]])
-      [[0, 1]]
-  """
-  return [a for a in alist if not a in blist]
 
 class Region():
   def __init__(self, region):

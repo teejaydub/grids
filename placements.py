@@ -106,7 +106,7 @@ class Placements():
     if isinstance(contents, str):
       # If I set it to a single symbol, make it into a list.
       contents = [contents]
-    logging.debug("setCell: %s = %s", chess.location(location), contents)
+    # logging.debug("setCell: %s = %s", chess.location(location), contents)
     if self.cells[location[0]][location[1]] != contents:
       self.cells[location[0]][location[1]] = contents
       self.changed = True
