@@ -203,12 +203,13 @@ class Puzzle:
       changes = c.apply(self)
       if changes != [c]:
         constraintsChanged = True
+        # logging.debug("constraint change from %s to %s", c, changes)
       if changes:
         newConstraints.extend(changes)
     self.constraints = newConstraints
     
     self.stats['passes'] += 1
-    return constraintsChanged or self.solution and self.solution.changed
+    return constraintsChanged or (self.solution and self.solution.changed)
 
   def logTechnique(self, name):
     """ Notes down the use of a named technique while solving. """

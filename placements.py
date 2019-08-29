@@ -118,6 +118,9 @@ class Placements():
     return index
 
   def setCell(self, location, contents):
+    """ Set the symbols for the given location to the given contents.
+        Return True and set self.changed if anything changed.
+    """
     if isinstance(contents, str):
       # If I set it to a single symbol, make it into a list.
       new = SymbolSet([contents])
@@ -126,24 +129,29 @@ class Placements():
     # logging.debug("setCell: %s = %s", chess.location(location), contents)
     if self.cells[location[0]][location[1]] != new:
       self.cells[location[0]][location[1]] = new
+      # logging.debug("setCell %s to %s", chess.location(location), new)
       self.changed = True
+      return True
+    return False
 
   def eliminateAt(self, location, symbols):
     """ Remove the given list of symbols from this placement 
         at the given coordinates.
+        Return True if anything was changed.
     """
     cell = self.cells[location[0]][location[1]]
-    new = cell.difference(symbols)
-    if new != cell:
-      self.setCell(location, new)
-      self.changed = True
+    return self.setCell(location, SymbolSet(cell.difference(symbols)))
 
   def eliminateThroughout(self, locations, symbols):
     """ Remove the given iterable of symbols from this placement
         everywhere within the given list of locations (which can be a Region).
+        Return a list of locations where anything was changed.
     """
+    result = []
     for location in locations:
-      self.eliminateAt(location, symbols)
+      if self.eliminateAt(location, symbols):
+        result.append(location)
+    return result
 
   def intersectAt(self, location, symbols):
     """ Eliminate symbols other than the given ones for the given location.
@@ -153,19 +161,15 @@ class Placements():
     if len(cell) == 1 and cell.value() == '*':
       new = SymbolSet(symbols)
     else:
-      new = cell & symbols
-    if new != cell:
-      self.setCell(location, new)
-      self.changed = True
-      return True
-    return False
+      new = SymbolSet(cell & symbols)
+    return self.setCell(location, new)
 
   def intersectThroughout(self, locations, symbols):
     """ Eliminate symbols other than the given symbols within the given locations.
-        Return True if anything was changed.
+        Return a list of locations where anything was changed.
     """
-    result = False
+    result = []
     for location in locations:
       if self.intersectAt(location, symbols):
-        result = True
+        result.append(location)
     return result

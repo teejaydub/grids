@@ -1,10 +1,11 @@
 from functools import reduce
+import itertools
 import logging
 import operator
 
 from .listutils import subtractLists
 from .constraint import Constraint
-from .symbolSet import SymbolSet
+from .symbolSet import SymbolSet, SymbolList
 from . import chess
 
 class Region():
@@ -162,30 +163,57 @@ class RegionSymbolsConstraint(RegionConstraint):
     return super().__str__() + ': ' + str(self.symbols) + ' in ' + str(self.region)
 
   def techniques(self):
-    return super().techniques() + [self.notAllowed, self.solo, self.filter]
+    return super().techniques() + [self.filterFromPuzzle, self.solo, self.filterSolution]
 
-  def notAllowed(self, puzzle):
+  def filterFromPuzzle(self, puzzle):
     """ Eliminate any symbols from this constraint that aren't in the puzzle's symbol set. """
-    if puzzle.symbols:
-      bad = subtractLists(self.symbols, puzzle.symbols)
-      if bad:
-        return [RegionSymbolsConstraint(self.region, subtractLists(self.symbols, bad))]
+    if puzzle.symbols and self.symbols > puzzle.symbols:
+      return [RegionSymbolsConstraint(self.region, SymbolSet(self.symbols & puzzle.symbols))]
 
   def solo(self, puzzle):
-    """ If there's only one symbol, it must be the symbol for a single cell.
+    """ If there's only one symbol, it must be the symbol for the entire region.
         Set that in the solution, and then we're done with this constraint.
     """
-    if len(self.symbols) == 1:  # Only one symbol is possible
+    if puzzle.solution and len(self.symbols) == 1:  # Only one symbol is possible
       for location in self.region:
-        if puzzle.solution.at(location) != self.symbols:  # don't log if it's redundant
+        if puzzle.solution.setCell(location, self.symbols):
           logging.debug("Solo: Placing %s at %s", self.symbols.value(), chess.location(location))
           puzzle.logTechnique('solo')
-          puzzle.solution.setCell(location, self.symbols)
       return []
 
-  def filter(self, puzzle):
+  def filterSolution(self, puzzle):
     """ Eliminate any symbols from this region that aren't in the constraint's symbol set.
     """
-    bad = puzzle.symbols - self.symbols
-    if bad:
-      puzzle.solution.eliminateThroughout(self.region, bad)
+    if puzzle.solution:
+      result = puzzle.solution.intersectThroughout(self.region, self.symbols)
+      if result:
+        logging.debug("Filter solution: symbols not in %s from %s", self.symbols, chess.locations(result))
+        puzzle.logTechnique('filterSolution')
+
+class RegionSymbolLists(RegionSymbolsConstraint):
+  """ A RegionSymbolsConstraint that knows several lists of symbols,
+      one per cell in the region, that have to be used in some order.
+      Like several possible RegionPermutesSymbols, but trickier since symbols can be repeated,
+      so you can't infer from the presence of the symbol in one place its absence in another.
+      If there is only one symbol list and it doesn't contain duplicates, it's reduced to RegionPermutesSymbols.
+  """
+  def __init__(self, region, symbolSets):
+    super().__init__(region, SymbolSet(itertools.chain.from_iterable(symbolSets)))  # the union of all the sets
+    assert symbolSets
+    self.symbolLists = [SymbolList(s) for s in symbolSets]
+
+  def __str__(self):
+    return self.__class__.__name__ + ': one of [' + ', '.join([str(s) for s in self.symbolLists]) + '] in ' + str(self.region)
+
+  def techniques(self):
+    return super().techniques() + []
+
+  def filterFromPuzzle(self, puzzle):
+    """ Overrides base case - must remove from the lists. """
+    if puzzle.symbols:
+      for slist in self.symbolLists:
+        if len(SymbolSet(slist) - puzzle.symbols) > 0:
+          # This symbol list has symbols that aren't in the puzzle: remove it.
+          new = self.symbolLists.copy()
+          new.remove(slist)
+          return [RegionSymbolLists(self.region, new)]

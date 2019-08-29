@@ -6,7 +6,7 @@ import re
 from . import chess
 from .factoring import *
 from .constraint import Constraint
-from .region import Region, RegionConstraint, RegionSymbolsConstraint
+from .region import Region, RegionConstraint, RegionSymbolsConstraint, RegionSymbolLists
 from .symbolSet import SymbolSet
 
 class SymbolsNumericDigits(Constraint):
@@ -145,6 +145,7 @@ class ProductIs(MathOp):
   """ A MathOp for multiplication. """
   def __init__(self, region, target):
     super().__init__(region, productF, '*', quotientF, '/', target)
+    self.factored = False
 
   def techniques(self):
     return super().techniques() + [self.primeFactors]
@@ -152,22 +153,26 @@ class ProductIs(MathOp):
   def primeFactors(self, puzzle):
     """ Figure out the possible symbols for this region using prime factors.
         All symbols must either be prime factors, or products of prime factors.
+        Do this just one time for this constraint.
     """
-    if puzzle.symbols and puzzle.solution:
+    if puzzle.symbols and puzzle.solution and not self.factored:
       # Step through all combinations of the factors of the target.
-      factorSymbols = SymbolSet()
+      allSymbols = SymbolSet()
+      allSymbolLists = []
       for factors in factorizations(self.target, self.region.size()):
-        sFactors = SymbolSet([str(f) for f in factors])
+        factorSymbolList = [str(f) for f in factors]
+        factorSet = SymbolSet(factorSymbolList)
         # Include a factorization only if all its factors are valid symbols in the puzzle.
-        if sFactors.intersection(puzzle.symbols) == sFactors:
-          factorSymbols.update(sFactors)
+        if factorSet <= puzzle.symbols:
+          allSymbolLists.append(factorSymbolList)
+          allSymbols.update(factorSet)
 
-      # No other symbols can be part of this region.
-      if len(factorSymbols) < len(puzzle.symbols):
-        if puzzle.solution.intersectThroughout(self.region, factorSymbols):
-          logging.debug("Prime factors: only include %s as factors of %s within %s",
-            factorSymbols, self.target, self.region)
-          puzzle.logTechnique('primeFactors')
+      # Generate a RegionSymbolLists constraint
+      new = RegionSymbolLists(self.region, allSymbolLists)
+      logging.debug("Prime factors: %s implies %s", self, new)
+      puzzle.logTechnique('primeFactors')
+      self.factored = True
+      return [self, new]
 
 class QuotientIs(MathOp):
   """ A MathOp for division. """

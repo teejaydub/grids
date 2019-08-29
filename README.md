@@ -21,8 +21,6 @@ Next to-dos:
     * Apply constraints
       * Prime factorization to eliminate candidates
         * Add a RegionSymbolLists constraint, that allows for several alternative lists of symbols, one of which must be used intact.
-          Create this constraint from ProductIs, but keep the ProductIs constraint around.
-            And only do it one time.
           If a cell is decided, partition the constraint and replace it, like RegionPermutesSymbols.
             Can that share any code with RegionPermutesSymbols?
           Eliminate a symbol set if any symbol in it is eliminated from the whole region.
