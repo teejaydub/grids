@@ -19,8 +19,8 @@ Next to-dos:
 * Better solving
   * Add constraint types for KenKen
     * Apply constraints
-      * For any two-cell MathOp, run through all possible values for the first cell and accumulate the inverses in the other.
-        Any result that's not allowed eliminates the symbol for the first cell, and the set of results is intersected with the other cell.
+      * Factor out inverseSet()
+      * Add test for kenken 1
       * Min/max constraints for SumIs to create RegionSymbolLists
       * For any MathOp, generate all possible values for each cell.
         Do this each time, writing results directly to the solution.

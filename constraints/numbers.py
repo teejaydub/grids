@@ -99,30 +99,41 @@ class MathOp(RegionConstraint):
               puzzle.logTechnique('removeKnown')
               return [RegionSymbolsConstraint(self.region.subtract([location]), {a})]
             else:
-              b = str(b)
+              b = str(round(b))
               logging.debug("Remove known: since %s and %s = %s, %s is %s or %s",
                 self, chess.location(location), value, self.region.subtract([location]), a, b)
               puzzle.logTechnique('removeKnown')
               return [RegionSymbolsConstraint(self.region.subtract([location]), {a, b})]
 
+  def inverseSet(self, value):
+    """ Apply the inverse operator to target and value and return the resulting symbol set.
+        Remove non-integer values from the result.
+        One or two values may be produced.
+    """
+    result = [self.inverse(self.target, value)]
+    if not self.isCommutative:
+      result.append(self.operator(value, self.target))
+    result = filter(lambda x: x == round(x), result)  # eliminate non-integers
+    return SymbolSet([str(round(x)) for x in result])
+
   def checkPair(self, puzzle, locations):
-    """ Check the ordered pair at the first two of the given list of locations
-        for valid operands, eliminate from the first if the second is invalid,
-        and return the second otherwise.
+    """ Check the ordered pair at the first two of the given list of locations.
+        Eliminate values from the first if the inverse operation doesn't produce 
+        a valid result in the second.        
     """
     cells = list(map(puzzle.solution.at, locations))
     for xs in cells[0]:
       x = int(xs)
-      if self.isCommutative:
-        # Only one solution to the inverse
-        y = self.inverse(self.target, x)
-        if round(y) != y or str(round(y)) not in cells[1]:
-          puzzle.solution.eliminateAt(locations[0], xs)
-          logging.debug("Operator: Because %s and %s%s%s = %s, %s can't be in %s", 
-            self, 
-            self.target, self.inverseName, xs, y,
-            xs, chess.location(locations[0]))
-          puzzle.logTechnique('twoCellOperator')
+      y = self.inverseSet(x)
+
+      if not (y & cells[1]):
+        puzzle.solution.eliminateAt(locations[0], xs)
+        logging.debug("Operator: Because %s and %s%s%s = %s, which isn't in %s, %s can't be in %s", 
+          self, 
+          self.target, self.inverseName, xs, y,
+          cells[1],
+          xs, chess.location(locations[0]))
+        puzzle.logTechnique('twoCellOperator')
 
   def twoCellOperator(self, puzzle):
     """ If the region has two cells, we can run through all possible pairs of values, 
