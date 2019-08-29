@@ -44,7 +44,11 @@ def solve(input, loglevel, singleStep):
     click.echo("Solved:")
     click.echo(str(p.solution))
   else:
-    click.echo("Can't solve.")
+    if p.isUnsolvable():
+      click.echo("Can't solve because it doesn't appear to be solvable.")
+      click.echo("(Error in creation or transcription?  Or my bad?)")
+    else:
+      click.echo("Can't solve.")
     click.echo("Best solution:")
     click.echo(p)
 
