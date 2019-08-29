@@ -14,7 +14,7 @@
 
 # Shorthand, using the Math convenience class:
 - Math: a5*a6*a7 = 30
-- Math: b2*b3=30
+- Math: b2*b3=42
 - Math: b5+c5+d5 = 18
 - Math: b6/b7 = 2
 - Math: c1+c2+d1+d2 = 15

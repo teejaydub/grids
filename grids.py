@@ -20,7 +20,7 @@ def cli():
 @click.option('-s', '--single-step', 'singleStep', flag_value=True, help="Pause at each step while solving")
 def solve(input, loglevel, singleStep):
   """ Solve a puzzle specified by one or more INPUT constraints files. """
-  logging.basicConfig(format='%(message)s', level=loglevel)
+  logging.basicConfig(format='%(message)s', level=loglevel)  # filename='output.txt' for grepping on Windows
 
   p = puzzle.Puzzle()
   if singleStep:

@@ -116,8 +116,8 @@ class RegionPermutesSymbols(RegionSymbolsConstraint):
           for s, locations in index.items():
             if intersection.hasSubset(locations):
               remainder = self.region.subtract(intersection)
-              logging.debug("Intersection: %s occurs only in %s, so remove it from %s",
-                s, intersection, chess.locations(remainder))
+              logging.debug("Intersection from %s: %s occurs only in %s, so remove it from %s",
+                constraint.region, s, intersection, chess.locations(remainder))
               puzzle.logTechnique('intersection')
               puzzle.solution.eliminateThroughout(remainder, [s])
 

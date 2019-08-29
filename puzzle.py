@@ -227,7 +227,7 @@ class Puzzle:
     self.stats = {'passes': 0, 'techniques': {} }
     # Reduce the constraints as far as possible analytically.
     while self.reduceConstraints() and not (self.isSolved() or self.isUnsolvable()):
-      logging.debug("\nReduced:\n%s", self)
+      logging.debug("\nPass %s:\n%s", self.stats['passes'], self)
     return self.isSolved()
 
   def isSolved(self):

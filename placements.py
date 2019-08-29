@@ -121,15 +121,15 @@ class Placements():
     """ Set the symbols for the given location to the given contents.
         Return True and set self.changed if anything changed.
     """
+    # logging.debug("setCell: %s = %s", chess.location(location), contents)
     if isinstance(contents, str):
       # If I set it to a single symbol, make it into a list.
       new = SymbolSet([contents])
     else:
       new = SymbolSet(contents)
-    # logging.debug("setCell: %s = %s", chess.location(location), contents)
     if self.cells[location[0]][location[1]] != new:
       self.cells[location[0]][location[1]] = new
-      # logging.debug("setCell %s to %s", chess.location(location), new)
+      # logging.debug("setCell: %s = %s", chess.location(location), new)
       self.changed = True
       return True
     return False
