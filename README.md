@@ -18,7 +18,8 @@ Next to-dos:
 
 * Better solving
   * Add constraint types for KenKen enough to solve KenKen 2
-    * Factor out inverseSet()
+    * Handle sums over three cells, at least.
+      * Refactor canMakeAnyTarget() - calls are all preceded by the same lines
     * Min/max constraints for SumIs to create RegionSymbolLists
     * For any MathOp, generate all possible values for each cell.
       Do this each time, writing results directly to the solution.
@@ -44,6 +45,7 @@ Next to-dos:
   * Add constraint file for KaKuRo
 * Puzzle creation, with target difficulty
 * Code improvements
+  * Factor out inverseSet() from removeKnown().
   * Many redundant partitions - if one of the constraints has just one cell, can we short-circuit it?
   * There are a lot of empty Regions constructed - is that something we can optimize out?
   * symbolsAreChars: simplify output further?  Simplify input?

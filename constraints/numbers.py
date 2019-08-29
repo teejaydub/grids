@@ -53,7 +53,7 @@ class MathOp(RegionConstraint):
     return super().__str__() + ': '+ self.region.display(self.operatorName, brackets=False) + ' = ' + str(self.target)
 
   def techniques(self):
-    return super().techniques() + [self.singleValue, self.removeKnown, self.twoCellOperator]
+    return super().techniques() + [self.singleValue, self.removeKnown, self.twoCellOperator, self.regionOperator]
 
   def singleValue(self, puzzle):
     """ Technique to set the target value as a symbol if the region contains only one cell. """
@@ -105,16 +105,26 @@ class MathOp(RegionConstraint):
               puzzle.logTechnique('removeKnown')
               return [RegionSymbolsConstraint(self.region.subtract([location]), {a, b})]
 
+  def inverseList(self, value, target=None):
+    """ Apply the inverse operator to target and value and return the resulting list of numeric values.
+        Remove non-integer values from the result.
+        One or two values may be produced.
+        The target defaults to the constraint's target.
+    """
+    if target is None:
+      target = self.target
+    result = [self.inverse(target, value)]
+    if not self.isCommutative:
+      result.append(self.operator(value, target))
+    result = filter(lambda x: x == round(x), result)  # eliminate non-integers
+    return result
+
   def inverseSet(self, value):
     """ Apply the inverse operator to target and value and return the resulting symbol set.
         Remove non-integer values from the result.
         One or two values may be produced.
     """
-    result = [self.inverse(self.target, value)]
-    if not self.isCommutative:
-      result.append(self.operator(value, self.target))
-    result = filter(lambda x: x == round(x), result)  # eliminate non-integers
-    return SymbolSet([str(round(x)) for x in result])
+    return SymbolSet([str(round(x)) for x in self.inverseList(value)])
 
   def checkPair(self, puzzle, locations):
     """ Check the ordered pair at the first two of the given list of locations.
@@ -139,10 +149,67 @@ class MathOp(RegionConstraint):
     """ If the region has two cells, we can run through all possible pairs of values, 
         and filter from the cells accordingly.
     """
-    if self.region.size() == 2 and puzzle.symbols and puzzle.solution:
-      if puzzle.solution.isInitializedThroughout(self.region):
+    if puzzle.symbols and puzzle.solution and puzzle.solution.isInitializedThroughout(self.region):
+      if self.region.size() == 2:
         self.checkPair(puzzle, self.region.cells)
         self.checkPair(puzzle, list(reversed(self.region.cells)))
+
+  def canMakeTarget(self, puzzle, target, locations):
+    """ Return True if there's an allowed set of values in locations
+        that will accumulate to the target value using our current operator.
+    """
+    if not locations:
+      return False
+    firstCell = puzzle.solution.at(locations[0])
+    if len(locations) == 1:
+      return str(round(target)) in firstCell
+    else:
+      # Peel off the first location and recurse.
+      restLocations = locations[1:]
+      for xs in firstCell:
+        x = int(xs)
+        y = self.inverseList(x, target)
+        if self.canMakeAnyTarget(puzzle, y, restLocations):
+          return True
+      return False
+
+  def canMakeAnyTarget(self, puzzle, targets, locations):
+    """ Return True if there is an allowed set of values in locations
+        that will accumulate to a value in targets using our current operator.
+    """
+    for target in targets:
+      if self.canMakeTarget(puzzle, target, locations):
+        return True
+    return False
+
+  def checkVersusRest(self, puzzle, location, restLocations):
+    """ Enumerate all possible values for the solution at the given location.
+        Given each and the target value, compute the new target values for the rest of the locations.
+        If applying the operator to those locations can't produce the given target, 
+        eliminate that value from the location.
+    """
+    cell = puzzle.solution.at(location)
+    for xs in cell:
+      x = int(xs)
+      y = self.inverseList(x)
+      if not self.canMakeAnyTarget(puzzle, y, restLocations):
+        logging.debug("Operator: Can't satisfy %s with %s in %s, so eliminating it", 
+          self,
+          xs,
+          chess.location(location))
+        puzzle.solution.eliminateAt(location, xs)
+        puzzle.logTechnique('regionOperator')
+
+  def regionOperator(self, puzzle):
+    """ Enumerate all possible lists of values for all cells in the region that would satisfy the operator,
+        constrained by the current symbol sets in those cells,
+        and eliminate the values that won't work.
+    """
+    if puzzle.symbols and puzzle.solution and puzzle.solution.isInitializedThroughout(self.region):
+      for i in range(self.region.size()):
+        restLocations = self.region.cells.copy()
+        del restLocations[i]
+        self.checkVersusRest(puzzle, self.region.cells[i], restLocations)
 
 class Math(MathOp):
   """ Convenience for more compact typing in input YAML.
