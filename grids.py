@@ -124,5 +124,20 @@ def test(verbose):
   assert "intersection" in result.output
   assert "misfit" in result.output
 
+  result = runner.invoke(cli, ['solve', 'ken-test-1.yml', '-v'])
+  assert result.exit_code == 0
+  assert """Solved:
+[ 4 3 1 2 5
+  3 5 2 4 1
+  5 1 4 3 2
+  2 4 5 1 3
+  1 2 3 5 4 ]
+""" in result.output
+  assert "twoCellOperator" in result.output
+  assert "primeFactors" in result.output
+  assert "makePermutation" in result.output
+  assert "removeKnown" in result.output
+  assert "filterSolution" in result.output
+
 if __name__ == "__main__":
   cli()
