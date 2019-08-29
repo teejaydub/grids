@@ -59,8 +59,6 @@ class RegionPermutesSymbols(RegionSymbolsConstraint):
         logging.debug("Partitioning out %s in %s, leaving %s in %s", 
           subset, chess.locations(coordList), remainder.symbols, remainder.region)
         puzzle.logTechnique('partition')
-
-        # If there's only one symbol in the subset, cut to the chase and just set it.
         result = [RegionPermutesSymbols(coordList, subset), remainder]
 
         # We can also remove all the subset symbols from the remainder region.

@@ -91,7 +91,7 @@ def test(verbose):
   8 3 7 2 4 1 9 5 6 ]
 """ in result.output
   assert "partition" in result.output
-  # assert "solo" in result.output
+  assert "misfit" in result.output
 
   result = runner.invoke(cli, ['solve', 'su-test-2.yml', '-v'])
   assert result.exit_code == 0
@@ -107,7 +107,6 @@ def test(verbose):
   3 8 1 5 4 9 7 2 6 ]
 """ in result.output
   assert "partition" in result.output
-  # assert "solo" in result.output
 
   result = runner.invoke(cli, ['solve', 'su-test-3.yml', '-v'])
   assert result.exit_code == 0
