@@ -53,7 +53,7 @@ class MathOp(RegionConstraint):
     return super().__str__() + ': '+ self.region.display(self.operatorName, brackets=False) + ' = ' + str(self.target)
 
   def techniques(self):
-    return super().techniques() + [self.singleValue, self.removeKnown]
+    return super().techniques() + [self.singleValue, self.removeKnown, self.twoCellOperator]
 
   def singleValue(self, puzzle):
     """ Technique to set the target value as a symbol if the region contains only one cell. """
@@ -104,6 +104,34 @@ class MathOp(RegionConstraint):
                 self, chess.location(location), value, self.region.subtract([location]), a, b)
               puzzle.logTechnique('removeKnown')
               return [RegionSymbolsConstraint(self.region.subtract([location]), {a, b})]
+
+  def checkPair(self, puzzle, locations):
+    """ Check the ordered pair at the first two of the given list of locations
+        for valid operands, eliminate from the first if the second is invalid,
+        and return the second otherwise.
+    """
+    cells = list(map(puzzle.solution.at, locations))
+    for xs in cells[0]:
+      x = int(xs)
+      if self.isCommutative:
+        # Only one solution to the inverse
+        y = self.inverse(self.target, x)
+        if round(y) != y or str(round(y)) not in cells[1]:
+          puzzle.solution.eliminateAt(locations[0], xs)
+          logging.debug("Operator: Because %s and %s%s%s = %s, %s can't be in %s", 
+            self, 
+            self.target, self.inverseName, xs, y,
+            xs, chess.location(locations[0]))
+          puzzle.logTechnique('twoCellOperator')
+
+  def twoCellOperator(self, puzzle):
+    """ If the region has two cells, we can run through all possible pairs of values, 
+        and filter from the cells accordingly.
+    """
+    if self.region.size() == 2 and puzzle.symbols and puzzle.solution:
+      if puzzle.solution.isInitializedThroughout(self.region):
+        self.checkPair(puzzle, self.region.cells)
+        self.checkPair(puzzle, list(reversed(self.region.cells)))
 
 class Math(MathOp):
   """ Convenience for more compact typing in input YAML.

@@ -19,18 +19,21 @@ Next to-dos:
 * Better solving
   * Add constraint types for KenKen
     * Apply constraints
-      * Prime factorization to eliminate candidates
-        * RegionSymbolLists
-          If a cell is decided, partition the constraint and replace it, like RegionPermutesSymbols.
-            Can that share any code with RegionPermutesSymbols?
-          Misfit() just like RegionPermutes
-          Eliminate a symbol set if any symbol in it is eliminated throughout the region.
-          Eliminate a symbol set if there's no permutation of it that can be placed in the region.
-            E.g., if you have [[1, 2, 2]] and 2 is available in only one cell in the region.
+      * For any two-cell MathOp, run through all possible values for the first cell and accumulate the inverses in the other.
+        Any result that's not allowed eliminates the symbol for the first cell, and the set of results is intersected with the other cell.
+      * Min/max constraints for SumIs to create RegionSymbolLists
+      * For any MathOp, generate all possible values for each cell.
+        Do this each time, writing results directly to the solution.
+        This may replace all that clever factorization (because it's essentially the same algorithm).
+      * RegionSymbolLists
+        * If a cell is decided, partition the constraint and replace it, like RegionPermutesSymbols.
+          Can that share any code with RegionPermutesSymbols?
+        * Misfit() just like RegionPermutes
+        * Eliminate a symbol set if any symbol in it is eliminated throughout the region.
+        * Eliminate a symbol set if there's no permutation of it that can be placed in the region.
+          E.g., if you have [[1, 2, 2]] and 2 is available in only one cell in the region.
         * Also include permutation uniqueness check for the set?  Or just do that with the solution set?
           E.g., if my cells are all in line, I can't have "2 2 6"
-      * Min/max constraints for SumIs to create RegionSymbolLists
-      * For any MathOp with two cells, run through possible values for one cell and accumulate operator results as possible values for the other cell.
       * If a MathOp constraint's region is a subset of a PermuteSymbolsConstraint's region, you can eliminate repetitions like n/2 for +
   * Add more solving techniques and test with "extreme" Sudokus
     * Tree traversal, starting with 2-symbol cells

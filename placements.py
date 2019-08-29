@@ -140,6 +140,8 @@ class Placements():
         Return True if anything was changed.
     """
     cell = self.cells[location[0]][location[1]]
+    if len(cell) == 1 and cell.value() == '*':
+      raise Exception("Can't eliminate in a placement where we haven't set the symbols.")
     return self.setCell(location, SymbolSet(cell.difference(symbols)))
 
   def eliminateThroughout(self, locations, symbols):
@@ -173,3 +175,13 @@ class Placements():
       if self.intersectAt(location, symbols):
         result.append(location)
     return result
+
+  def isInitializedAt(self, location):
+    cell = self.at(location)
+    return '*' not in cell
+
+  def isInitializedThroughout(self, locations):
+    for location in locations:
+      if not self.isInitializedAt(location):
+        return False
+    return True
