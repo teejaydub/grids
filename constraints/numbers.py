@@ -183,7 +183,7 @@ class AllCellsMustHaveMathOp(Constraint):
       for row in range(0, puzzle.size[0]):
         for col in range(0, puzzle.size[1]):
           if not self.inMathOp(puzzle, (row, col)):
-            raise Exception("The cell " + chess.location((row, col)) + " doesn't have a MathOp constriant.")
+            raise Exception("The cell " + chess.location((row, col)) + " doesn't have a MathOp constraint.")
 
       return []  # finished
     else:
@@ -193,6 +193,6 @@ class AllCellsMustHaveMathOp(Constraint):
     """ Return True iff the puzzle has a MathOp constraint that includes the given location in its Region. """
     for c in puzzle.constraints:
       if isinstance(c, MathOp):
-        if not c.contains(location):
+        if c.contains(location):
           return True
     return False
