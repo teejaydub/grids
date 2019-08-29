@@ -146,7 +146,9 @@ class Placements():
       self.eliminateAt(location, symbols)
 
   def intersectAt(self, location, symbols):
-    """ Eliminate symbols other than the given ones for the given location. """
+    """ Eliminate symbols other than the given ones for the given location.
+        Return True if anything was changed.
+    """
     cell = self.cells[location[0]][location[1]]
     if len(cell) == 1 and cell.value() == '*':
       new = SymbolSet(symbols)
@@ -155,8 +157,15 @@ class Placements():
     if new != cell:
       self.setCell(location, new)
       self.changed = True
+      return True
+    return False
 
   def intersectThroughout(self, locations, symbols):
-    """ Only the given symbols are valid within the given locations. """
+    """ Eliminate symbols other than the given symbols within the given locations.
+        Return True if anything was changed.
+    """
+    result = False
     for location in locations:
-      self.intersectAt(location, symbols)
+      if self.intersectAt(location, symbols):
+        result = True
+    return result

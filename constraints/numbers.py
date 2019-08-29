@@ -158,9 +158,10 @@ class ProductIs(MathOp):
 
       # No other symbols can be part of this region.
       if len(factorSymbols) < len(puzzle.symbols):
-        logging.debug("Prime factors: only include %s as factors of %s within %s",
-          factorSymbols, self.target, self.region)
-        puzzle.solution.intersectThroughout(self.region, factorSymbols)
+        if puzzle.solution.intersectThroughout(self.region, factorSymbols):
+          logging.debug("Prime factors: only include %s as factors of %s within %s",
+            factorSymbols, self.target, self.region)
+          puzzle.logTechnique('primeFactors')
 
 class QuotientIs(MathOp):
   """ A MathOp for division. """
