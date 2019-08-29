@@ -6,7 +6,8 @@ import re
 from . import chess
 from .factoring import *
 from .constraint import Constraint
-from .region import Region, RegionConstraint, RegionSymbolsConstraint, RegionSymbolLists
+from .region import Region, RegionConstraint, RegionSymbolsConstraint
+from .regionSymbolLists import RegionSymbolLists
 from .symbolSet import SymbolSet
 
 class SymbolsNumericDigits(Constraint):
