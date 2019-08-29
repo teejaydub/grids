@@ -3,6 +3,7 @@ import logging
 from . import chess
 from .constraint import Constraint
 from .region import Region, RegionSymbolsConstraint, subtractLists
+from .symbolSet import SymbolSet
 
 class RegionPermutesSymbols(RegionSymbolsConstraint):
   """ The core logic for regions containing each symbol in a set,
@@ -26,8 +27,8 @@ class RegionPermutesSymbols(RegionSymbolsConstraint):
 
   def techniques(self):
     return super().techniques() + [
-      self.partition, 
-      self.misfit, 
+      self.misfit,
+      self.partition,
       self.borrow,
       self.intersection
     ]
@@ -46,18 +47,20 @@ class RegionPermutesSymbols(RegionSymbolsConstraint):
     for location in self.region:
       subset = puzzle.solution.at(location)
       if len(subset) < len(self.symbols):
-        symbols = '|'.join(subset)
-        index.setdefault(symbols, []).append(location)
+        symbolsKey = '|'.join(subset)
+        index.setdefault(symbolsKey, []).append(location)
 
     for symbols, coordList in index.items():
-      subset = symbols.split('|')
+      subset = SymbolSet(symbols.split('|'))
       if len(subset) == len(coordList):
-        # There are the same number of symbols in this set as cells to put them in.
+        # There are the same number of symbols in this subset as cells to put them in.
         # So, the given coordList can be partitioned off from the rest of the region.
         remainder = self.remainder(coordList, subset)
         logging.debug("Partitioning out %s in %s, leaving %s in %s", 
-          self.showSymbols(subset), chess.locations(coordList), self.showSymbols(remainder.symbols), remainder.region)
+          subset, chess.locations(coordList), remainder.symbols, remainder.region)
         puzzle.logTechnique('partition')
+
+        # If there's only one symbol in the subset, cut to the chase and just set it.
         result = [RegionPermutesSymbols(coordList, subset), remainder]
 
         # We can also remove all the subset symbols from the remainder region.
@@ -80,7 +83,7 @@ class RegionPermutesSymbols(RegionSymbolsConstraint):
         puzzle.solution.setCell(locations[0], s)
         remainder = self.remainder(locations, [s])
         logging.debug("Misfit: %s must be %s, since it can't occur elsewhere in %s",
-          chess.location(locations[0]), self.showSymbols(s), self.region)
+          chess.location(locations[0]), s, self.region)
         puzzle.logTechnique('misfit')
         return [remainder]
 
@@ -95,7 +98,7 @@ class RegionPermutesSymbols(RegionSymbolsConstraint):
         if self.region.hasProperSubset(constraint.region):
           remainder = self.remainderConstraint(constraint)
           logging.debug("Borrowing %s from %s, leaving %s in %s", 
-            self.showSymbols(constraint.symbols), constraint.region, self.showSymbols(remainder.symbols), remainder.region)
+            constraint.symbols, constraint.region, remainder.symbols, remainder.region)
           puzzle.logTechnique('borrow')
           puzzle.solution.eliminateThroughout(remainder.region, constraint.symbols)
           return [remainder]
@@ -127,7 +130,7 @@ class RegionPermutesSymbols(RegionSymbolsConstraint):
         from this region's locations and symbols.
     """
     remainderLocations = self.region.subtract(locations)
-    remainderSymbols = subtractLists(self.symbols, symbols)
+    remainderSymbols = self.symbols.difference(symbols)
     return RegionPermutesSymbols(remainderLocations, remainderSymbols)
 
   def remainderConstraint(self, other):

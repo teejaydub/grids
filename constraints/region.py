@@ -4,6 +4,7 @@ import operator
 
 from .listutils import subtractLists
 from .constraint import Constraint
+from .symbolSet import SymbolSet
 from . import chess
 
 class Region():
@@ -155,10 +156,10 @@ class RegionSymbolsConstraint(RegionConstraint):
   """
   def __init__(self, region, symbols):
     super().__init__(region)
-    self.symbols = symbols
+    self.symbols = SymbolSet(symbols)
 
   def __str__(self):
-    return super().__str__() + ': ' + self.showSymbols(self.symbols) + ' in ' + str(self.region)
+    return super().__str__() + ': ' + str(self.symbols) + ' in ' + str(self.region)
 
   def techniques(self):
     return super().techniques() + [self.notAllowed, self.solo, self.filter]
@@ -175,15 +176,16 @@ class RegionSymbolsConstraint(RegionConstraint):
         Set that in the solution, and then we're done with this constraint.
     """
     if len(self.symbols) == 1:  # Only one symbol is possible
-      if puzzle.solution.at(self.region.cells[0]) != self.symbols:  # don't log if it's redundant
-        logging.debug("Solo: Placing %s at %s", self.symbols[0], chess.location(self.region.cells[0]))
-        puzzle.logTechnique('solo')
-        puzzle.solution.setCell(self.region.cells[0], self.symbols)
+      for location in self.region:
+        if puzzle.solution.at(location) != self.symbols:  # don't log if it's redundant
+          logging.debug("Solo: Placing %s at %s", self.symbols.value(), chess.location(location))
+          puzzle.logTechnique('solo')
+          puzzle.solution.setCell(location, self.symbols)
       return []
 
   def filter(self, puzzle):
     """ Eliminate any symbols from this region that aren't in the constraint's symbol set.
     """
-    bad = subtractLists(puzzle.symbols, self.symbols)
+    bad = puzzle.symbols - self.symbols
     if bad:
       puzzle.solution.eliminateThroughout(self.region, bad)

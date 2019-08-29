@@ -12,6 +12,8 @@ understanding of how to solve the problem without code.  Plus, it's fun!
 
 Solves easy to hard Sudoku with 5 techniques.
 
+Beginning support for KenKen, but not able to solve them yet.
+
 Next to-dos:
 
 * Better solving
@@ -20,8 +22,14 @@ Next to-dos:
       * Prime factorization to eliminate candidates
         * Only "count" and announce the Prime Factors technique when it changes something.
         * Check values for symbol-set legality in singleValue.
-        * What about a RegionSymbolSets constraint, that allows for several alternative sets of symbols, one of which must be used intact?
-          If that gets down to one alternative, and its symbols are unique, it can be replaced with a RegionPermutesSymbols constraint.
+        * Add a RegionSymbolSets constraint, that allows for several alternative sets of symbols, one of which must be used intact.
+          Create this constraint from ProductIs, but keep the ProductIs constraint around.
+            And only do the primeFactors technique one time.
+          If a cell is decided, partition the constraint and replace it.
+            Can that share code with RegionPermutesSymbols?
+          Eliminate a symbol set if any symbol in it is eliminated from the whole region.
+          Eliminate a symbol set if there's no permutation of it that can be placed in the region.
+          If it gets down to one symbol set, and its symbols are unique, it can be replaced with a RegionPermutesSymbols constraint.
         * Also include permutation uniqueness check for the set?  Or just do that with the solution set?
           E.g., if my cells are all in line, I can't have "2 2 6"
       * If a MathOp constraint's region is a subset of a PermuteSymbolsConstraint's region, you can eliminate repetitions like n/2 for +
@@ -36,7 +44,6 @@ Next to-dos:
   * Add constraint file for KaKuRo
 * Puzzle creation, with target difficulty
 * Code improvements
-  * Shouldn't we be using sets for symbols?  Seems like the 'in' tests might be more efficient, as well as eliminations, etc.
   * Many redundant partitions - if one of the constraints has just one cell, can we short-circuit it?
   * There are a lot of empty Regions constructed - is that something we can optimize out?
   * symbolsAreChars: simplify output further?  Simplify input?

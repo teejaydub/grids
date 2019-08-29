@@ -7,6 +7,7 @@ from . import chess
 from .factoring import *
 from .constraint import Constraint
 from .region import Region, RegionConstraint, RegionSymbolsConstraint
+from .symbolSet import SymbolSet
 
 class SymbolsNumericDigits(Constraint):
   """ Sets the symbol set to the numeric digits, 1-9,
@@ -16,7 +17,7 @@ class SymbolsNumericDigits(Constraint):
     self.max_digits = max_digits
 
   def apply(self, puzzle):
-    puzzle.symbols = [str(x) for x in range(1, self.max_digits + 1)]
+    puzzle.symbols = SymbolSet([str(x) for x in range(1, self.max_digits + 1)])
     logging.debug("Setting symbols to %s", puzzle.symbols)
     return []
 
@@ -72,8 +73,8 @@ class MathOp(RegionConstraint):
     if puzzle.solution:
       for location in self.region:
         cell = puzzle.solution.at(location)
-        if len(cell) == 1 and cell[0] != '*':
-          value = int(cell[0])
+        if len(cell) == 1 and cell.value() != '*':
+          value = int(cell.value())
           if self.isCommutative:
             # For + and *, we can just apply the inverse operator to our current target to find the new target.
             new = copy.copy(self)
@@ -148,9 +149,9 @@ class ProductIs(MathOp):
     """
     if puzzle.symbols and puzzle.solution:
       # Step through all combinations of the factors of the target.
-      factorSymbols = set()
+      factorSymbols = SymbolSet()
       for factors in factorizations(self.target, self.region.size()):
-        sFactors = set([str(f) for f in factors])
+        sFactors = SymbolSet([str(f) for f in factors])
         # Include a factorization only if all its factors are valid symbols in the puzzle.
         if sFactors.intersection(puzzle.symbols) == sFactors:
           factorSymbols.update(sFactors)
@@ -158,7 +159,7 @@ class ProductIs(MathOp):
       # No other symbols can be part of this region.
       if len(factorSymbols) < len(puzzle.symbols):
         logging.debug("Prime factors: only include %s as factors of %s within %s",
-          self.showSymbols(factorSymbols), self.target, self.region)
+          factorSymbols, self.target, self.region)
         puzzle.solution.intersectThroughout(self.region, factorSymbols)
 
 class QuotientIs(MathOp):

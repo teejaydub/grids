@@ -25,12 +25,6 @@ class Constraint:
   def __str__(self):
     return self.__class__.__name__
 
-  def showSymbols(self, symbols):
-    """ Formats a list of symbols, returning a string.
-        It's here just because it's a convenient place to standardize it.
-    """
-    return '(' + ' '.join(sorted([s for s in symbols])) + ')'
-
   def apply(self, puzzle):
     """ Apply this constraint to the given puzzle.
         Return a list of the constraints that should now replace this one.

@@ -1,6 +1,8 @@
+import itertools
 import logging
 
 from constraints import chess
+from constraints.symbolSet import SymbolSet
 
 def showCell(cell):
   """ Returns a string representing a given cell's contents.
@@ -9,16 +11,16 @@ def showCell(cell):
   if not cell:
     return '_'
   if len(cell) == 1:
-    return cell[0]
+    return cell.value()
   else:
-    return '(' + ' '.join(cell) + ')'
+    return str(cell)
 
 class Placements():
   """ A copy of an entire puzzle grid, with a set of possible symbols for each cell.
       If a cell has only one symbol, it's fully determined.
       If it has no symbols, the puzzle is unsolveable.
   """
-  # A list of lists (for two dimensions), each cell of which contains a list of possible symbols.
+  # A list of lists (for two dimensions), each cell of which contains a SymbolSet of possible symbols.
   cells = None
   changed = False
 
@@ -46,11 +48,12 @@ class Placements():
     elif isinstance(x, list):
       if isinstance(x[0], str):
         # The strings must each be a row of single-character symbols.
-        return [list(row.strip()) for row in x]
+        return [[SymbolSet(cell) for cell in list(row.strip())] for row in x]
       elif isinstance(x[0], list):
         # It's an array of arrays.
         # Assume it's in fully-defined list form.
-        return x
+        # Convert each cell to a SymbolSet.
+        return [[SymbolSet(cell) for cell in row] for row in x]
       else:
         raise Exception("Can't initialize with list " + str(x))
     else:
@@ -83,7 +86,7 @@ class Placements():
         False
     """
     for cell in self.all():
-      if len(cell) != 1 or cell == '*':
+      if len(cell) != 1 or cell.value() == '*':
         return False
     return True
 
@@ -91,16 +94,16 @@ class Placements():
     """ Return True if at least one cell contains no items.
         >>> Placements([[[]], [['1']]]).isUnsolvable()
         True
-        >>> Placements([[['1'], [['2', '3']]]]).isUnsolvable()
+        >>> Placements([[['1'], ['2', '3']]]).isUnsolvable()
         False
     """
     for cell in self.all():
-      if cell == []:
+      if len(cell) == 0:
         return True
     return False
 
   def at(self, location):
-    """ Returns the contents of the grid cell at the specified coordinates (a list or tuple).
+    """ Returns the contents of the grid cell at the specified coordinates (a SymbolSet).
     """
     return self.cells[location[0]][location[1]]
 
@@ -117,10 +120,12 @@ class Placements():
   def setCell(self, location, contents):
     if isinstance(contents, str):
       # If I set it to a single symbol, make it into a list.
-      contents = [contents]
+      new = SymbolSet([contents])
+    else:
+      new = SymbolSet(contents)
     # logging.debug("setCell: %s = %s", chess.location(location), contents)
-    if self.cells[location[0]][location[1]] != contents:
-      self.cells[location[0]][location[1]] = contents
+    if self.cells[location[0]][location[1]] != new:
+      self.cells[location[0]][location[1]] = new
       self.changed = True
 
   def eliminateAt(self, location, symbols):
@@ -128,13 +133,13 @@ class Placements():
         at the given coordinates.
     """
     cell = self.cells[location[0]][location[1]]
-    new = [s for s in cell if not s in symbols]
+    new = cell.difference(symbols)
     if new != cell:
       self.setCell(location, new)
       self.changed = True
 
   def eliminateThroughout(self, locations, symbols):
-    """ Remove the given list of symbols from this placement
+    """ Remove the given iterable of symbols from this placement
         everywhere within the given list of locations (which can be a Region).
     """
     for location in locations:
@@ -143,10 +148,10 @@ class Placements():
   def intersectAt(self, location, symbols):
     """ Eliminate symbols other than the given ones for the given location. """
     cell = self.cells[location[0]][location[1]]
-    if cell == ['*'] or cell == '*':
-      new = [s for s in symbols]
+    if len(cell) == 1 and cell.value() == '*':
+      new = SymbolSet(symbols)
     else:
-      new = [s for s in cell if s in symbols]
+      new = cell & symbols
     if new != cell:
       self.setCell(location, new)
       self.changed = True

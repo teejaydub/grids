@@ -18,7 +18,7 @@ class Puzzle:
     self.constraints = []
     self.dimensions = None
     self.size = None
-    self.symbols = None  # a list of strings
+    self.symbols = None  # a SymbolSet
     self.symbolsAreChars = True  # True if all symbols are single-character strings  (to do: default to None and set with symbols)
     self.initial = None  # a Placement
     self.solution = None  # a Placement, set when a solution is found
@@ -175,10 +175,14 @@ class Puzzle:
     """ For every cell in the solution that contains '*',
         replace the '*' with a list of all the symbols.
     """
+    logged = False
     if self.size and self.solution and self.symbols:
       for location in region.Region(self.size):
         cell = self.solution.at(location)
-        if cell == '*' or cell == ['*']:
+        if cell.value() == '*':
+          if not logged:
+            logging.debug("Expanding stars.")
+            logged = True
           self.solution.setCell(location, self.symbols)
 
   def reduceConstraints(self):
