@@ -20,18 +20,17 @@ Next to-dos:
   * Add constraint types for KenKen
     * Apply constraints
       * Prime factorization to eliminate candidates
-        * Only "count" and announce the Prime Factors technique when it changes something.
-        * Check values for symbol-set legality in singleValue.
-        * Add a RegionSymbolSets constraint, that allows for several alternative sets of symbols, one of which must be used intact.
+        * Add a RegionSymbolLists constraint, that allows for several alternative lists of symbols, one of which must be used intact.
           Create this constraint from ProductIs, but keep the ProductIs constraint around.
-            And only do the primeFactors technique one time.
-          If a cell is decided, partition the constraint and replace it.
-            Can that share code with RegionPermutesSymbols?
+            And only do it one time.
+          If a cell is decided, partition the constraint and replace it, like RegionPermutesSymbols.
+            Can that share any code with RegionPermutesSymbols?
           Eliminate a symbol set if any symbol in it is eliminated from the whole region.
           Eliminate a symbol set if there's no permutation of it that can be placed in the region.
           If it gets down to one symbol set, and its symbols are unique, it can be replaced with a RegionPermutesSymbols constraint.
         * Also include permutation uniqueness check for the set?  Or just do that with the solution set?
           E.g., if my cells are all in line, I can't have "2 2 6"
+      * Min/max constraints for SumIs
       * If a MathOp constraint's region is a subset of a PermuteSymbolsConstraint's region, you can eliminate repetitions like n/2 for +
   * Add more solving techniques and test with "extreme" Sudokus
     * Tree traversal, starting with 2-symbol cells

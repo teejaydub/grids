@@ -89,14 +89,20 @@ class MathOp(RegionConstraint):
             # Make a RegionSymbolsConstraint for that, and eliminate values.
             assert self.region.size() == 2
             a = str(self.inverse(self.target, value))
-            b = str(self.operator(value, self.target))
+            b = self.operator(value, self.target)
 
-            # TODO: If b is not an integer, it's not an option.
-
-            logging.debug("Remove known: since %s and %s = %s, %s is %s or %s",
-              self, chess.location(location), value, self.region.subtract([location]), a, b)
-            puzzle.logTechnique('removeKnown')
-            return [RegionSymbolsConstraint(self.region.subtract([location]), [a, b])]
+            # If b is not an integer, it's not an option.
+            if round(b) != b:
+              logging.debug("Remove known: since %s and %s = %s, %s is %s (not %s)",
+                self, chess.location(location), value, self.region.subtract([location]), a, b)
+              puzzle.logTechnique('removeKnown')
+              return [RegionSymbolsConstraint(self.region.subtract([location]), {a})]
+            else:
+              b = str(b)
+              logging.debug("Remove known: since %s and %s = %s, %s is %s or %s",
+                self, chess.location(location), value, self.region.subtract([location]), a, b)
+              puzzle.logTechnique('removeKnown')
+              return [RegionSymbolsConstraint(self.region.subtract([location]), {a, b})]
 
 class Math(MathOp):
   """ Convenience for more compact typing in input YAML.
