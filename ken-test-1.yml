@@ -1,36 +1,14 @@
 - KenKen
-- size: [7, 7]
-
-# Explicitly list region constraints:
-- name: DifferenceIs
-  region: a1 b1
-  target: 5
-- name: SumIs
-  region: a2 a3
-  target: 5
-- name: DifferenceIs
-  region: a4 b4
-  target: 4
-
-# Shorthand, using the Math convenience class:
-- Math: a5*a6*a7 = 30
-- Math: b2*b3=30
-- Math: b5+c5+d5 = 18
-- Math: b6/b7 = 2
-- Math: c1+c2+d1+d2 = 15
-- Math: c4/d4 = 2
-- Math: c6/c7 = 3
-
-# Even shorter:
-- c3 = 5
-- d6 = 5
-- e1 = 7
-- d3+e3+f3 = 13
-- d7/e7 = 3
-- e2-f2 = 3
-- e4-f4 = 4
-- e5-e6 = 3
-- f1+g1+g2 = 10
-- f5+g5+g6 = 11
-- f6+f7+g7 = 17
-- g3/g4 = 3
+- size: [5, 5]
+- a1-b1 = 3
+- a2*b2*b3 = 30
+- a3/a4 = 2
+- a5 = 5
+- b4+c4 = 7
+- b5+c5 = 3
+- c1-d1 = 3
+- c2-c3 = 3
+- d2+e2+e1 = 7
+- d3 = 5
+- d4+e4+e3 = 9
+- d5-e5 = 1
