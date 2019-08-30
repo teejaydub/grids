@@ -18,12 +18,11 @@ Next to-dos:
 
 * Better solving
   * Add constraint types for KenKen enough to solve KenKen 2
-    * Handle sums over three cells, at least.
-      * Refactor canMakeAnyTarget() - calls are all preceded by the same lines
+    * Tree traversal
+      Should it be choosing the guess cells at random?  Results are different each time!
+      Note prospective cells, and color them differently when printing
+    * Refactor canMakeAnyTarget() - calls are all preceded by the same lines
     * Min/max constraints for SumIs to create RegionSymbolLists
-    * For any MathOp, generate all possible values for each cell.
-      Do this each time, writing results directly to the solution.
-      This may replace all that clever factorization (because it's essentially the same algorithm).
     * RegionSymbolLists
       * If a cell is decided, partition the constraint and replace it, like RegionPermutesSymbols.
         Can that share any code with RegionPermutesSymbols?
@@ -35,7 +34,6 @@ Next to-dos:
         E.g., if my cells are all in line, I can't have "2 2 6"
     * If a MathOp constraint's region is a subset of a PermuteSymbolsConstraint's region, you can eliminate repetitions like n/2 for +
   * Add more solving techniques and test with "extreme" Sudokus
-    * Tree traversal, starting with 2-symbol cells
     * Associate difficulty levels with techniques
       * Exhaust easier techniques before trying harder ones?
       * Report highest difficulty level reached

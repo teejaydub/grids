@@ -22,7 +22,7 @@ class Puzzle:
     self.symbolsAreChars = True  # True if all symbols are single-character strings  (to do: default to None and set with symbols)
     self.initial = None  # a Placement
     self.solution = None  # a Placement, set when a solution is found
-    self.stats = None
+    self.stats = {}
     self.techniqueCallback = None  # Set to call back each time a technique is used.
 
   def addConstraints(self, constraints):
@@ -208,12 +208,52 @@ class Puzzle:
         newConstraints.extend(changes)
     self.constraints = newConstraints
     
-    self.stats['passes'] += 1
+    self.stats['passes'] = self.stats.get('passes', 0) + 1
     return constraintsChanged or (self.solution and self.solution.changed)
+
+  def searchSolutionSpace(self):
+    """ Explore the remaining solution possibilities, depth-first,
+        but trying to pick likely avenues to explore.
+        Stop only when the puzzle is solved or proven unsolvable.
+        Return True if it's solved.
+    """
+    # Sort the solution cells by the number of possibilities remaining, omitting decided cells.
+    index = {}  # maps n -> last location that has n possibilities
+    for location in self.solution.allLocations():
+      cell = self.solution.at(location)
+      if len(cell) > 1:
+        index[len(cell)] = location
+
+    # Find the first available cell with the least number of symbols.
+    counts = sorted(list(index.keys()))
+    location = index[counts[0]]
+    cell = self.solution.at(location)
+
+    # Make a new Puzzle with each possibility set in that location, and solve.
+    logging.debug("\n== SEARCHING SOLUTION SPACE SEQUENTIALLY ==\n")
+    self.stats.setdefault('firstPasses', self.stats['passes'])  # just the first time - see how many passes before we guessed
+    self.stats['plies'] = self.stats.get('plies', 0) + 1
+    for s in cell:
+      p = copy.deepcopy(self)
+      logging.debug("Setting %s from %s to %s arbitrarily, then continuing.",
+        chess.location(location), cell, s)
+      p.solution.setCell(location, {s})
+      p.logTechnique('guess')
+      logging.debug("New puzzle:\n%s", p)
+      if p.solve():
+        self.stats = p.stats
+        self.solution = p.solution
+        return True
+      else:
+        self.stats = p.stats
+
+    # The nested Puzzle will have tried all the other options, so we're done - it's not solvable.
+    # I don't see how this could happen unless there's a bug in this routine!
+    return False
 
   def logTechnique(self, name):
     """ Notes down the use of a named technique while solving. """
-    t = self.stats['techniques']
+    t = self.stats.setdefault('techniques', {})
     t[name] = t.setdefault(name, 0) + 1
     if self.techniqueCallback:
       self.techniqueCallback(name)
@@ -223,11 +263,12 @@ class Puzzle:
         If one can be found, return True and put its position in self.solution.
         If not, return False.
     """
-    # Collect some stats as we go.
-    self.stats = {'passes': 0, 'techniques': {} }
     # Reduce the constraints as far as possible analytically.
-    while self.reduceConstraints() and not (self.isSolved() or self.isUnsolvable()):
+    while self.reduceConstraints() and not self.isFinished():
       logging.debug("\nPass %s:\n%s", self.stats['passes'], self)
+    # Then try brute force: pick at random and explore the possibilities.
+    if not self.isFinished():
+      self.searchSolutionSpace()
     return self.isSolved()
 
   def isSolved(self):
@@ -241,3 +282,9 @@ class Puzzle:
     if not self.solution:
       return False
     return self.solution.isUnsolvable()
+
+  def isFinished(self):
+    """ Return True if the puzzle is either solved or unsolvable.
+        False means there might be a solution but we haven't found it yet.
+    """
+    return self.isSolved() or self.isUnsolvable()

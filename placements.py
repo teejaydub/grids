@@ -78,6 +78,12 @@ class Placements():
       for cell in row:
         yield cell
 
+  def allLocations(self):
+    """ Iterate through all locations in the grid. """
+    for row in range(len(self.cells)):
+      for col in range(len(self.cells[row])):
+        yield (row, col)
+
   def isSolved(self):
     """ Return True iff all cells contain one item.
         >>> Placements([['1','2']]).isSolved()

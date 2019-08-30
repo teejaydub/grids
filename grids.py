@@ -31,16 +31,19 @@ def solve(input, loglevel, singleStep):
   logging.info(p)
   logging.info("\nSolving...")
 
-  result = p.solve();
+  p.solve();
 
   # Report stats but not using logging - so it's available to regression tests.
   if loglevel <= logging.INFO:
-    click.echo("\nTook %s passes." % p.stats['passes'])
+    click.echo("\nTook %s reduction passes." % p.stats['passes'])
+    if 'plies' in p.stats:
+      click.echo("After the first %s passes, explored the solution tree to %s plies." 
+        % (p.stats['firstPasses'], p.stats['plies']))
     techniques = sorted(p.stats['techniques'].items(), key=lambda kv: -kv[1])
     click.echo("Used these techniques: %s" % ', '.join([t[0] + ' (' + str(t[1]) + 'x)' for t in techniques]))
 
   logging.info("")  # separator
-  if result:
+  if p.isSolved():
     click.echo("Solved:")
     click.echo(str(p.solution))
   else:
