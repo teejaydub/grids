@@ -10,18 +10,28 @@ understanding of how to solve the problem without code.  Plus, it's fun!
 
 ## Current status
 
-Solves easy to hard Sudoku with 5 techniques.
+Solves all known Sudoku and KenKen, using clever constraints followed by dumb
+brute-force solution tree traversal.
 
-Beginning support for KenKen, but not able to solve them yet.
+## Roadmap
 
-Next to-dos:
-
+* Ease of use
+  * Hint mode: show next modification to the solution and the constraint it comes from
+  * Allow interactive prompting for initial if it's not provided (or any other missing parameters?)
+    * Then save that to an auto-named file for convenient re-editing
+  * Assume `.yml` extension for input files - so "grids solve Sudoku" is a complete command line.
+* Puzzle creation, with target difficulty
+  * Associate difficulty levels with techniques
+    * Exhaust easier techniques before trying harder ones?
+    * Report highest difficulty level reached
 * Better solving
-  * Add constraint types for KenKen enough to solve KenKen 2
+  * Recent cleanup
     * Tree traversal
       Should it be choosing the guess cells at random?  Results are different each time!
       Note prospective cells, and color them differently when printing
     * Refactor canMakeAnyTarget() - calls are all preceded by the same lines
+    * Factor out inverseSet() from removeKnown().
+  * Further smarts
     * Min/max constraints for SumIs to create RegionSymbolLists
     * RegionSymbolLists
       * If a cell is decided, partition the constraint and replace it, like RegionPermutesSymbols.
@@ -33,28 +43,17 @@ Next to-dos:
       * Also include permutation uniqueness check for the set?  Or just do that with the solution set?
         E.g., if my cells are all in line, I can't have "2 2 6"
     * If a MathOp constraint's region is a subset of a PermuteSymbolsConstraint's region, you can eliminate repetitions like n/2 for +
-  * Add more solving techniques and test with "extreme" Sudokus
-    * Associate difficulty levels with techniques
-      * Exhaust easier techniques before trying harder ones?
-      * Report highest difficulty level reached
     * Pencilmark-friendly output when can't solve: huge ASCII, or HTML?
     * Other Permutation techniques that operate between constraints
   * Add constraint file for Sixy Sudoku
   * Add constraint file for KaKuRo
-* Puzzle creation, with target difficulty
 * Code improvements
-  * Factor out inverseSet() from removeKnown().
   * Many redundant partitions - if one of the constraints has just one cell, can we short-circuit it?
   * There are a lot of empty Regions constructed - is that something we can optimize out?
   * symbolsAreChars: simplify output further?  Simplify input?
   * Better input error handling
     Its own exception type, with more helpful context and suggestions?
       Look at Click's user input exceptions
-* Ease of use
-  * Hint mode: show next modification to the solution and the constraint it comes from
-  * Allow interactive prompting for initial if it's not provided (or any other missing parameters?)
-    * Then save that to an auto-named file for convenient re-editing
-  * Assume `.yml` extension for input files - so "grids solve Sudoku" is a complete command line.
 
 ## Concepts
 
@@ -162,6 +161,7 @@ specifying one of the following actions:
 
 * Find a single solution for the puzzle, then back up the search tree as far
   as possible while still having only one solution, and output the placement.
+  [not yet implemented]
 
 Other options include the verbosity of output describing the search process.
 
