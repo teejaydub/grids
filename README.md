@@ -10,8 +10,8 @@ understanding of how to solve the problem without code.  Plus, it's fun!
 
 ## Current status
 
-Solves all known Sudoku and KenKen, using clever constraints followed by dumb
-brute-force solution tree traversal.
+Solves all known Sudoku and KenKen quickly, using clever constraints followed
+by dumb brute-force solution tree traversal.
 
 ## Roadmap
 
@@ -25,23 +25,16 @@ brute-force solution tree traversal.
     * Exhaust easier techniques before trying harder ones?
     * Report highest difficulty level reached
 * Better solving
-  * Recent cleanup
-    * Tree traversal
-      Should it be choosing the guess cells at random?  Results are different each time!
-      Note prospective cells, and color them differently when printing
-    * Refactor canMakeAnyTarget() - calls are all preceded by the same lines
   * Further smarts
-    * Min/max constraints for SumIs to create RegionSymbolLists
     * RegionSymbolLists
-      * If a cell is decided, partition the constraint and replace it, like RegionPermutesSymbols.
-        Can that share any code with RegionPermutesSymbols?
-      * Misfit() just like RegionPermutes
       * Eliminate a symbol set if any symbol in it is eliminated throughout the region.
       * Eliminate a symbol set if there's no permutation of it that can be placed in the region.
         E.g., if you have [[1, 2, 2]] and 2 is available in only one cell in the region.
+      * If a cell is decided, partition the constraint and replace it, like RegionPermutesSymbols.
+        Can that share any code with RegionPermutesSymbols?
+      * Misfit() just like RegionPermutes
       * Also include permutation uniqueness check for the set?  Or just do that with the solution set?
         E.g., if my cells are all in line, I can't have "2 2 6"
-    * If a MathOp constraint's region is a subset of a PermuteSymbolsConstraint's region, you can eliminate repetitions like n/2 for +
     * Pencilmark-friendly output when can't solve: huge ASCII, or HTML?
     * Other Permutation techniques that operate between constraints
   * Add constraint file for Sixy Sudoku
