@@ -142,16 +142,13 @@ class RegionConstraint(Constraint):
     return self.region.contains(location)
 
   def techniques(self):
-    return super().techniques() + [self.done]
+    return super().techniques() + [self.empty]
 
-  def done(self, puzzle):
-    """ Discard this constraint if its region is all decided.
-        Also applies if the region is empty.
-    """
-    if puzzle.solution:
-      if puzzle.solution.isDecidedThroughout(self.region):
-        logging.debug("Discarding finished region %s", self.region)
-        return []
+  def empty(self, puzzle):
+    """ Catch any empty constraints and discard them. """
+    if self.region.isEmpty():
+      logging.debug("discarding empty region")
+      return []
 
 class RegionSymbolsConstraint(RegionConstraint):
   """ A RegionConstraint that knows a subset of the puzzle's symbols
