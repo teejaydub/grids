@@ -3,6 +3,8 @@
 
 import click
 import logging
+import os
+
 import puzzle
 
 @click.group()
@@ -17,10 +19,17 @@ def cli():
 @click.option('--normal-output', 'loglevel', flag_value=logging.WARNING, help="Normal output", default=True)
 @click.option('-v', '--verbose', 'loglevel', flag_value=logging.INFO, help="More output")
 @click.option('-d', '--debug', 'loglevel', flag_value=logging.DEBUG, help="Debugging output")
+@click.option('-dd', '--debug-to-file', 'debugToFile', flag_value=True, help="Send debugging output to debug.log")
 @click.option('-s', '--single-step', 'singleStep', flag_value=True, help="Pause at each step while solving")
-def solve(input, loglevel, singleStep):
+def solve(input, loglevel, debugToFile, singleStep):
   """ Solve a puzzle specified by one or more INPUT constraints files. """
-  logging.basicConfig(format='%(message)s', level=loglevel)  # filename='output.txt' for grepping on Windows
+  if debugToFile:
+    logFileName = 'debug.log'
+    if os.path.exists(logFileName):
+      os.remove(logFileName)
+    logging.basicConfig(format='%(message)s', level=logging.DEBUG, filename='debug.log')
+  else:
+    logging.basicConfig(format='%(message)s', level=loglevel)  # filename='output.txt' for grepping on Windows
 
   p = puzzle.Puzzle()
   if singleStep:
