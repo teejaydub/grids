@@ -137,6 +137,21 @@ def test(verbose):
   assert "intersection" in result.output
   assert "misfit" in result.output
 
+  result = runner.invoke(cli, ['solve', 'su-test-4.yml', '-v'])
+  assert result.exit_code == 0
+  assert """Solved:
+[ 1 7 6 3 5 2 8 4 9
+  4 2 8 9 1 6 3 5 7
+  3 9 5 8 7 4 2 6 1
+  5 6 3 7 2 1 4 9 8
+  9 4 7 6 3 8 5 1 2
+  2 8 1 4 9 5 6 7 3
+  7 5 9 2 6 3 1 8 4
+  6 3 4 1 8 7 9 2 5
+  8 1 2 5 4 9 7 3 6 ]
+""" in result.output
+  assert "guess" in result.output
+
   result = runner.invoke(cli, ['solve', 'ken-test-1.yml', '-v'])
   assert result.exit_code == 0
   assert """Solved:
@@ -165,6 +180,7 @@ def test(verbose):
   5 3 2 6 1 7 4 ]
 """ in result.output
   assert "guess" in result.output
+  assert "filterSolution" in result.output
 
 if __name__ == "__main__":
   cli()
