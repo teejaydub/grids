@@ -24,10 +24,11 @@ def cli():
 def solve(input, loglevel, debugToFile, singleStep):
   """ Solve a puzzle specified by one or more INPUT constraints files. """
   if debugToFile:
+    loglevel = logging.DEBUG
     logFileName = 'debug.log'
     if os.path.exists(logFileName):
       os.remove(logFileName)
-    logging.basicConfig(format='%(message)s', level=logging.DEBUG, filename='debug.log')
+    logging.basicConfig(format='%(message)s', level=loglevel, filename='debug.log')
   else:
     logging.basicConfig(format='%(message)s', level=loglevel)  # filename='output.txt' for grepping on Windows
 
