@@ -30,7 +30,6 @@ brute-force solution tree traversal.
       Should it be choosing the guess cells at random?  Results are different each time!
       Note prospective cells, and color them differently when printing
     * Refactor canMakeAnyTarget() - calls are all preceded by the same lines
-    * Factor out inverseSet() from removeKnown().
   * Further smarts
     * Min/max constraints for SumIs to create RegionSymbolLists
     * RegionSymbolLists

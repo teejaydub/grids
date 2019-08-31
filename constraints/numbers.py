@@ -59,7 +59,6 @@ class MathOp(RegionConstraint):
     """ Technique to set the target value as a symbol if the region contains only one cell. """
     if puzzle.symbols and puzzle.solution:
       if self.region.size() == 1:
-        assert self.isCommutative  # otherwise, you shouldn't end up with a single cell
         logging.debug("Single value: %s has a target value of %s",
           chess.location(self.region.cells[0]), self.target)
         assert str(self.target) in puzzle.symbols
@@ -76,34 +75,25 @@ class MathOp(RegionConstraint):
         cell = puzzle.solution.at(location)
         if len(cell) == 1 and cell.value() != '*':
           value = int(cell.value())
-          if self.isCommutative:
-            # For + and *, we can just apply the inverse operator to our current target to find the new target.
+          inverses = self.inverseSet(value)
+
+          if len(inverses) == 1:
+            # Only one possible target value, so make a new constraint to target that.
             new = copy.copy(self)
-            new.target = round(self.inverse(self.target, value))
+            new.target = int(inverses.value())
             new.region = self.region.subtract([location])
-            logging.debug("Remove known: since %s and %s = %s, %s %s %s = %s",
-              self, chess.location(location), value, self.target, self.inverseName, value, new.target)
+            logging.debug("Remove known: since %s and %s = %s, make %s",
+              self, chess.location(location), value, new)
             puzzle.logTechnique('removeKnown')
             return [new]
-          else:
-            # For - and / with two cells, there are now two possibilities for the remaining cell.
+          elif self.region.size() == 2:
+            # There are now two possibilities for the remaining cell.
             # Make a RegionSymbolsConstraint for that, and eliminate values.
-            assert self.region.size() == 2
-            a = str(self.inverse(self.target, value))
-            b = self.operator(value, self.target)
-
-            # If b is not an integer, it's not an option.
-            if round(b) != b:
-              logging.debug("Remove known: since %s and %s = %s, %s is %s (not %s)",
-                self, chess.location(location), value, self.region.subtract([location]), a, b)
-              puzzle.logTechnique('removeKnown')
-              return [RegionSymbolsConstraint(self.region.subtract([location]), {a})]
-            else:
-              b = str(round(b))
-              logging.debug("Remove known: since %s and %s = %s, %s is %s or %s",
-                self, chess.location(location), value, self.region.subtract([location]), a, b)
-              puzzle.logTechnique('removeKnown')
-              return [RegionSymbolsConstraint(self.region.subtract([location]), {a, b})]
+            new = RegionSymbolsConstraint(self.region.subtract([location]), inverses)
+            logging.debug("Remove known: since %s and %s = %s, make %s",
+              self, chess.location(location), value, new)
+            puzzle.logTechnique('removeKnown')
+            return [new]
 
   def inverseList(self, value, target=None):
     """ Apply the inverse operator to target and value and return the resulting list of numeric values.
