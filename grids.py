@@ -165,7 +165,6 @@ def test(verbose):
   assert "primeFactors" in result.output
   assert "makePermutation" in result.output
   assert "removeKnown" in result.output
-  assert "filterSolution" in result.output
 
   result = runner.invoke(cli, ['solve', 'ken-test-2.yml', '-v'])
   assert result.exit_code == 0
@@ -179,7 +178,6 @@ def test(verbose):
   5 3 2 6 1 7 4 ]
 """ in result.output
   assert "guess" in result.output
-  assert "filterSolution" in result.output
 
 if __name__ == "__main__":
   cli()
