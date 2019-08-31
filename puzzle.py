@@ -235,7 +235,7 @@ class Puzzle:
     self.stats['plies'] = self.stats.get('plies', 0) + 1
     for s in cell:
       p = copy.deepcopy(self)
-      logging.debug("Setting %s from %s to %s arbitrarily, then continuing.",
+      logging.debug("\nSetting %s from %s to %s as a guess, then continuing.",
         chess.location(location), cell, s)
       p.solution.setCell(location, {s})
       p.logTechnique('guess')
@@ -245,6 +245,8 @@ class Puzzle:
         self.solution = p.solution
         return True
       else:
+        logging.debug("\n%s", p)
+        logging.debug("Reached dead end; reverting this guess.")
         self.stats = p.stats
 
     # The nested Puzzle will have tried all the other options, so we're done - it's not solvable.
