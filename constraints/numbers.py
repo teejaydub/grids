@@ -70,12 +70,13 @@ class MathOp(RegionConstraint):
     """ Technique to remove cells with known values from the region,
         and generate a new constraint that adjusts the target appropriately.
     """
-    if puzzle.solution:
+    if puzzle.solution and puzzle.symbols:
       for location in self.region:
         cell = puzzle.solution.at(location)
         if len(cell) == 1 and cell.value() != '*':
           value = int(cell.value())
           inverses = self.inverseSet(value)
+          inverses.intersection_update(puzzle.symbols)
 
           if len(inverses) == 1:
             # Only one possible target value, so make a new constraint to target that.
