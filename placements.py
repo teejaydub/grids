@@ -191,3 +191,13 @@ class Placements():
       if not self.isInitializedAt(location):
         return False
     return True
+
+  def isDecidedAt(self, location):
+    cell = self.at(location)
+    return len(cell) == 1 and '*' not in cell
+
+  def isDecidedThroughout(self, locations):
+    for location in locations:
+      if not self.isDecidedAt(location):
+        return False
+    return True

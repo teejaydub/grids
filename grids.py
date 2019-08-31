@@ -150,7 +150,8 @@ def test(verbose):
   assert "primeFactors" in result.output
   assert "makePermutation" in result.output
   assert "removeKnown" in result.output
-  assert "filterSolution" in result.output
+  assert "regionOperator" in result.output
+  assert "singleValue" in result.output
 
 if __name__ == "__main__":
   cli()
