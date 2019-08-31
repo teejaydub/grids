@@ -153,5 +153,18 @@ def test(verbose):
   assert "regionOperator" in result.output
   assert "singleValue" in result.output
 
+  result = runner.invoke(cli, ['solve', 'ken-test-2.yml', '-v'])
+  assert result.exit_code == 0
+  assert """Solved:
+[ 6 4 1 7 2 3 5
+  1 6 7 3 5 4 2
+  3 1 5 4 7 2 6
+  4 7 3 2 6 5 1
+  7 2 6 5 4 1 3
+  2 5 4 1 3 6 7
+  5 3 2 6 1 7 4 ]
+""" in result.output
+  assert "guess" in result.output
+
 if __name__ == "__main__":
   cli()
