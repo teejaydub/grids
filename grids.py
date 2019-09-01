@@ -153,6 +153,17 @@ def test(verbose):
 """ in result.output
   assert "guess" in result.output
 
+  result = runner.invoke(cli, ['solve', 'six-test-1.yml', '-v'])
+  assert result.exit_code == 0
+  assert """Solved:
+[ 3 2 5 4 6 1
+  4 6 1 2 5 3
+  1 5 6 3 2 4
+  2 4 3 6 1 5
+  6 1 4 5 3 2
+  5 3 2 1 4 6 ]
+""" in result.output
+
   result = runner.invoke(cli, ['solve', 'ken-test-1.yml', '-v'])
   assert result.exit_code == 0
   assert """Solved:
