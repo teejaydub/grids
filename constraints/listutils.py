@@ -17,10 +17,12 @@ def subtractListsUnique(alist, blist):
       That is, one instance of 2 in blist removes one instance of 2 in alist.
 
       >>> subtractLists([1, 2, 2, 3], [2])
+      [1, 3]
+      >>> list(subtractListsUnique([1, 2, 2, 3], [2]))
       [1, 2, 3]
-      >>> subtractLists(['1', '2', '3'], ['1'])
+      >>> list(subtractListsUnique(['1', '2', '3'], ['1']))
       ['2', '3']
-      >>> subtractLists([[0, 0], [0, 0], [0, 1]], [[0, 0]])
+      >>> list(subtractListsUnique([[0, 0], [0, 0], [0, 1]], [[0, 0]]))
       [[0, 0], [0, 1]]
   """
   blist = list(blist[:])  # copy so as not to modify original

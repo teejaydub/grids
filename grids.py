@@ -76,9 +76,10 @@ def test(verbose):
   # Using docstrings:
   import doctest
   import placements
-  from constraints import chess, region, permutations, numbers, factoring
+  from constraints import chess, listutils, region, permutations, numbers, factoring
   doctest.testmod(verbose=verbose)
   doctest.testmod(chess, verbose=verbose)
+  doctest.testmod(listutils, verbose=verbose)
   doctest.testmod(numbers, verbose=verbose)
   doctest.testmod(permutations, verbose=verbose)
   doctest.testmod(placements, verbose=verbose)
