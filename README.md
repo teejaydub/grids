@@ -15,11 +15,10 @@ by dumb brute-force solution tree traversal.
 
 ## Roadmap
 
-* Ease of use
-  * Hint mode: show next modification to the solution and the constraint it comes from
-  * Allow interactive prompting for initial if it's not provided (or any other missing parameters?)
-    * Then save that to an auto-named file for convenient re-editing
-  * Assume `.yml` extension for input files - so "grids solve Sudoku" is a complete command line.
+* Hint mode: show next modification to the solution and the constraint it comes from
+  * Works great until you get to guessing.
+    If this is on, maybe we need to NOT pause until we've gone through and confirmed that the guess is correct,
+    then report it, then don't set the puzzle solution, just set that cell and continue from there.
 * Puzzle creation, with target difficulty
   * Associate difficulty levels with techniques
     * Exhaust easier techniques before trying harder ones?
@@ -40,12 +39,16 @@ by dumb brute-force solution tree traversal.
   * Add constraint file for Sixy Sudoku
   * Add constraint file for KaKuRo
 * Code improvements
-  * Many redundant partitions - if one of the constraints has just one cell, can we short-circuit it?
+  * Do we still need `changed` as well as `onChange` in `Placements`?
   * There are a lot of empty Regions constructed - is that something we can optimize out?
   * symbolsAreChars: simplify output further?  Simplify input?
   * Better input error handling
     Its own exception type, with more helpful context and suggestions?
       Look at Click's user input exceptions
+* Ease of use
+  * Allow interactive prompting for initial if it's not provided (or any other missing parameters?)
+    * Then save that to an auto-named file for convenient re-editing
+  * Assume `.yml` extension for input files - so "grids solve Sudoku" is a complete command line.
 
 ## Concepts
 

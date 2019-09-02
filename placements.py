@@ -23,6 +23,7 @@ class Placements():
   # A list of lists (for two dimensions), each cell of which contains a SymbolSet of possible symbols.
   cells = None
   changed = False
+  onChange = None  # Called whenever anything changes, with (self, location, old, new).
 
   def __init__(self, initial):
     # logging.debug("Placements(%s)", initial)
@@ -133,7 +134,10 @@ class Placements():
       new = SymbolSet([contents])
     else:
       new = SymbolSet(contents)
-    if self.cells[location[0]][location[1]] != new:
+    old = self.cells[location[0]][location[1]]
+    if new != old:
+      if self.onChange:
+        self.onChange(self, location, old, new)
       self.cells[location[0]][location[1]] = new
       # logging.debug("setCell: %s = %s", chess.location(location), new)
       self.changed = True

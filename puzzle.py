@@ -24,6 +24,7 @@ class Puzzle:
     self.solution = None  # a Placement, set when a solution is found
     self.stats = {}
     self.techniqueCallback = None  # Set to call back each time a technique is used.
+    self.solutionCallback = None  # Set to call back each time the solution is changed.
 
   def addConstraints(self, constraints):
     """ Add constraints from various sources, distinguished by type.
@@ -259,6 +260,9 @@ class Puzzle:
     t[name] = t.setdefault(name, 0) + 1
     if self.techniqueCallback:
       self.techniqueCallback(name)
+    # Also a convenient time to propagate the solution callback.
+    if self.solution:
+      self.solution.onChange = self.solutionCallback
 
   def solve(self):
     """ Attempt to find a solution to the initial condition and constraints.

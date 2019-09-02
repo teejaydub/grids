@@ -6,6 +6,7 @@ import logging
 import os
 
 import puzzle
+from constraints import chess
 
 @click.group()
 
@@ -20,7 +21,8 @@ def cli():
 @click.option('-v', '--verbose', 'loglevel', flag_value=logging.INFO, help="More output")
 @click.option('-d', '--debug', 'loglevel', flag_value=logging.DEBUG, help="Debugging output")
 @click.option('-dd', '--debug-to-file', 'debugToFile', flag_value=True, help="Send debugging output to debug.log")
-@click.option('-s', '--single-step', 'singleStep', flag_value=True, help="Pause at each step while solving")
+@click.option('-s', '--solution-step', 'singleStep', flag_value=1, help="Pause when solution is modified")
+@click.option('-ss', '--single-step', 'singleStep', flag_value=2, help="Pause at each inference")
 def solve(input, loglevel, debugToFile, singleStep):
   """ Solve a puzzle specified by one or more INPUT constraints files. """
   if debugToFile:
@@ -33,8 +35,12 @@ def solve(input, loglevel, debugToFile, singleStep):
     logging.basicConfig(format='%(message)s', level=loglevel)  # filename='output.txt' for grepping on Windows
 
   p = puzzle.Puzzle()
-  if singleStep:
+
+  if singleStep >= 2:
     p.techniqueCallback = showStep
+  if singleStep >= 1:
+    p.solutionCallback = showSolutionChange
+
   for i in input:
     p.addConstraints(i)
   logging.info("Puzzle:")
@@ -67,6 +73,12 @@ def solve(input, loglevel, debugToFile, singleStep):
 
 def showStep(name):
   click.confirm("Continue?", default=True, abort=True)
+
+def showSolutionChange(placements, location, old, new):
+  if len(new) == 1:
+    click.echo(placements)
+    click.echo("Changed %s from %s to %s" % (chess.location(location), old, new))
+    click.confirm("Continue?", default=True, abort=True)
 
 @cli.command()
 @click.option('-v/-q', '--verbose/--quiet', 'verbose')
