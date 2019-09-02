@@ -15,10 +15,6 @@ by dumb brute-force solution tree traversal.
 
 ## Roadmap
 
-* Hint mode: show next modification to the solution and the constraint it comes from
-  * Works great until you get to guessing.
-    If this is on, maybe we need to NOT pause until we've gone through and confirmed that the guess is correct,
-    then report it, then don't set the puzzle solution, just set that cell and continue from there.
 * Puzzle creation, with target difficulty
   * Associate difficulty levels with techniques
     * Exhaust easier techniques before trying harder ones?

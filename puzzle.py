@@ -236,14 +236,26 @@ class Puzzle:
     self.stats['plies'] = self.stats.get('plies', 0) + 1
     for s in cell:
       p = copy.deepcopy(self)
+      p.solutionCallback = None  # Don't report these changes, because we don't know if they're correct yet.
+      p.solution.onChange = None
+
       logging.debug("\nSetting %s from %s to %s as a guess, then continuing.",
         chess.location(location), cell, s)
       p.solution.setCell(location, {s})
       p.logTechnique('guess')
       logging.debug("New puzzle:\n%s", p)
+
       if p.solve():
-        self.stats = p.stats
-        self.solution = p.solution
+        if self.solutionCallback:
+          # The user wants to see the final changes, not the tentative ones.
+          # So, take the confirmed change, but then redo the subsequent logic.
+          logging.debug("\nConfirmed guess.")
+          self.solution.setCell(location, {s})
+          self.solve()
+        else:
+          # We're just going for a solution, so take the results from the guess.
+          self.stats = p.stats
+          self.solution = p.solution
         return True
       else:
         logging.debug("\n%s", p)
