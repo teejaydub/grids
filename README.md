@@ -16,35 +16,8 @@ by dumb brute-force solution tree traversal.
 ## Roadmap
 
 * Puzzle creation, with target difficulty
-  * Associate difficulty levels with techniques
-    * Exhaust easier techniques before trying harder ones?
-    * Report highest difficulty level reached
 * Better solving
-  * Further smarts
-    * RegionSymbolLists
-      * Eliminate a symbol set if any symbol in it is eliminated throughout the region.
-      * Eliminate a symbol set if there's no permutation of it that can be placed in the region.
-        E.g., if you have [[1, 2, 2]] and 2 is available in only one cell in the region.
-      * If a cell is decided, partition the constraint and replace it, like RegionPermutesSymbols.
-        Can that share any code with RegionPermutesSymbols?
-      * Misfit() just like RegionPermutes
-      * Also include permutation uniqueness check for the set?  Or just do that with the solution set?
-        E.g., if my cells are all in line, I can't have "2 2 6"
-    * Pencilmark-friendly output when can't solve: huge ASCII, or HTML?
-    * Other Permutation techniques that operate between constraints
-  * Add constraint file for Sixy Sudoku
-  * Add constraint file for KaKuRo
-* Code improvements
-  * Do we still need `changed` as well as `onChange` in `Placements`?
-  * There are a lot of empty Regions constructed - is that something we can optimize out?
-  * symbolsAreChars: simplify output further?  Simplify input?
-  * Better input error handling
-    Its own exception type, with more helpful context and suggestions?
-      Look at Click's user input exceptions
-* Ease of use
-  * Allow interactive prompting for initial if it's not provided (or any other missing parameters?)
-    * Then save that to an auto-named file for convenient re-editing
-  * Assume `.yml` extension for input files - so "grids solve Sudoku" is a complete command line.
+  * Pencilmark-friendly output when can't solve: huge ASCII, or HTML?
 
 ## Concepts
 
@@ -268,3 +241,38 @@ Specializations include `SumIs`, `DifferenceIs`, `ProductIs`, and
 `QuotientIs`. These are useful because they can follow custom search rules -
 e.g., `ProductIs` can do a prime factorization, `SumIs` can use min/max
 analysis, etc.
+
+## To do
+
+* Puzzle creation, with target difficulty
+  * Associate difficulty levels with techniques
+    * Exhaust easier techniques before trying harder ones?
+    * Report highest difficulty level reached
+    * Report a rating showing the number of techniques used
+      Maybe weighted by the relative difficulty of those techniques
+      Maybe only count the technique applications that resulted in a change?
+      Or maybe anything beyond easy/medium/hard/extreme is too fine to be meaningful.
+* Better solving
+  * Further smarts
+    * RegionSymbolLists
+      * Eliminate a symbol set if any symbol in it is eliminated throughout the region.
+      * Eliminate a symbol set if there's no permutation of it that can be placed in the region.
+        E.g., if you have [[1, 2, 2]] and 2 is available in only one cell in the region.
+      * If a cell is decided, partition the constraint and replace it, like RegionPermutesSymbols.
+        Can that share any code with RegionPermutesSymbols?
+      * Misfit() just like RegionPermutes
+      * Also include permutation uniqueness check for the set?  Or just do that with the solution set?
+        E.g., if my cells are all in line, I can't have "2 2 6"
+    * Pencilmark-friendly output when can't solve: huge ASCII, or HTML?
+    * Other Permutation techniques that operate between constraints
+* Code improvements
+  * Do we still need `changed` as well as `onChange` in `Placements`?
+  * There are a lot of empty Regions constructed - is that something we can optimize out?
+  * symbolsAreChars: simplify output further?  Simplify input?
+  * Better input error handling
+    Its own exception type, with more helpful context and suggestions?
+      Look at Click's user input exceptions
+* Ease of use
+  * Allow interactive prompting for initial if it's not provided (or any other missing parameters?)
+    * Then save that to an auto-named file for convenient re-editing
+  * Assume `.yml` extension for input files - so "grids solve Sudoku" is a complete command line.

@@ -1,0 +1,7 @@
+# KaKuRo constraints
+# All the regions are specific to the individual puzzle, as is the size.
+# Addition constraints are added just like in KenKen.
+constraints:
+  - SymbolsNumericByDiameter
+  - EachDimensionIsCompletePermutation
+  - AllCellsMustHaveMathOp
