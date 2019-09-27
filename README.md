@@ -244,6 +244,7 @@ analysis, etc.
 
 ## To do
 
+* Wait, do I have the chess notation backward?  Seems like it's a-h left-to-right, and 1-8 bottom-to-top, but I'm interpreting them top-to-bottom, left-to-right?
 * Puzzle creation, with target difficulty
   * Associate difficulty levels with techniques
     * Exhaust easier techniques before trying harder ones?
