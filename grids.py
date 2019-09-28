@@ -36,9 +36,9 @@ def solve(input, loglevel, debugToFile, singleStep):
 
   p = puzzle.Puzzle()
 
-  if singleStep >= 2:
+  if singleStep and singleStep >= 2:
     p.techniqueCallback = showStep
-  if singleStep >= 1:
+  if singleStep and singleStep >= 1:
     p.solutionCallback = showSolutionChange
 
   for i in input:
