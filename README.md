@@ -103,6 +103,9 @@ contraints:
     ]
 ```
 
+Note that when grid solutions are printed out, the convention is that
+`a` is the top row, and `a1` is the leftmost column of the top row.
+
 These are complete definitions of the Sudoku class of puzzles and an
 individual puzzle.
 
